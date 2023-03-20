@@ -42,6 +42,11 @@ public class Board : MonoBehaviour
         if (MineField[x, y] == 0)
         {
             AdjSquares(x, y).ForEach(s => s.Reveal());
+            return;
+        }
+        if( MineField[x, y] == 9)
+        {
+            SquareField.Foreach(s=> s.RevealGameover());
         }
     }
     private List<Square> AdjSquares(int x, int y)

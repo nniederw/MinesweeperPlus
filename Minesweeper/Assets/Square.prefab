@@ -105,9 +105,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   NumberText: {fileID: 4440164582111195496}
+  Flagged: 0
   UnOpenedSquare: {fileID: 21300000, guid: 01e1c396ce5380b439771162fd8b11bc, type: 3}
   OpenedSquare: {fileID: 21300000, guid: ca821a091913b3e45bd9453a0d67011f, type: 3}
   FlaggedSquare: {fileID: 21300000, guid: 58ca2f15b26989b4bac2ba00198f376d, type: 3}
+  OpenedMine: {fileID: 21300000, guid: 313376a14466075428bca0d1737ac94b, type: 3}
+  Mine: {fileID: 21300000, guid: c32f57f53357363438c3402c3e3b2f5c, type: 3}
 --- !u!61 &4242393283029991544
 BoxCollider2D:
   m_ObjectHideFlags: 0

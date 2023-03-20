@@ -155,6 +155,7 @@ MonoBehaviour:
   SizeX: 10
   SizeY: 10
   Mines: 15
+  MinesLeft: 15
   Cell: {fileID: 2122455210547539556, guid: 5c46004c7ee846a4eb213cbe7affe467, type: 3}
 --- !u!224 &56018973
 RectTransform:

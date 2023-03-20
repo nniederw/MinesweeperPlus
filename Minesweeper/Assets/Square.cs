@@ -1,13 +1,10 @@
 using System;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UIElements;
 
 [RequireComponent(typeof(SpriteRenderer))]
 public class Square : MonoBehaviour
 {
-    private const char MineChar = '\u25A1'; //= '\u2600';
     private int X;
     private int Y;
     public Action<int, int> OnOpen;
@@ -22,6 +19,8 @@ public class Square : MonoBehaviour
     [SerializeField] private Sprite UnOpenedSquare = null;
     [SerializeField] private Sprite OpenedSquare = null;
     [SerializeField] private Sprite FlaggedSquare = null;
+    [SerializeField] private Sprite OpenedMine = null;
+    [SerializeField] private Sprite Mine = null;
     private RectTransform Rect
     {
         get
@@ -43,7 +42,7 @@ public class Square : MonoBehaviour
         Number = number;
         if (Number == 9)
         {
-            NumberText.text = MineChar.ToString();
+            NumberText.text = "";
         }
         else if (Number == 0)
         {
@@ -71,6 +70,13 @@ public class Square : MonoBehaviour
         }
         UpdateVisuals();
     }
+    public void RevealGameover()
+    {
+        if (Number == 9)
+        {
+            Reveal();
+        }
+    }
     private void OnMouseUp()
     {
         if (!Revealed)
@@ -78,6 +84,10 @@ public class Square : MonoBehaviour
             OnOpen?.Invoke(X, Y);
             Revealed = true;
             UpdateVisuals();
+            if (Number == 9)
+            {
+                SpriteRenderer.sprite = OpenedMine;
+            }
         }
         else
         {
@@ -99,7 +109,7 @@ public class Square : MonoBehaviour
         if (Revealed)
         {
             NumberText.enabled = true;
-            SpriteRenderer.sprite = OpenedSquare;
+            SpriteRenderer.sprite = Number == 9 ? Mine : OpenedSquare;
             return;
         }
         NumberText.enabled = false;
