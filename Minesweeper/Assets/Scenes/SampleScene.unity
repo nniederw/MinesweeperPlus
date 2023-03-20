@@ -152,7 +152,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2530d255efcd0524f9898fb53e72a14f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Cell: {fileID: 1672107305116125743, guid: 5c46004c7ee846a4eb213cbe7affe467, type: 3}
+  SizeX: 10
+  SizeY: 10
+  Mines: 15
+  Cell: {fileID: 2122455210547539556, guid: 5c46004c7ee846a4eb213cbe7affe467, type: 3}
 --- !u!224 &56018973
 RectTransform:
   m_ObjectHideFlags: 0
