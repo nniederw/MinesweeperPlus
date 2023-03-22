@@ -19,4 +19,8 @@ public static class Ext
         foreach (var i in arr) { action(i); }
         return arr;
     }
+    public static bool InBound<T>(this T[] arr, int i)
+        => i >= 0 && i < arr.Length;
+    public static bool InBound<T>(this T[,] arr, int i, int j)
+        => i >= 0 && i < arr.GetLength(0) && j >= 0 && j < arr.GetLength(1);
 }
