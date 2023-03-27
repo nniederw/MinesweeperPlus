@@ -9,9 +9,9 @@ public class BoardSolverTest
     [Test]
     public void BoardSolverTestSimplePasses()
     {
-        BoardSolver solver = new BoardSolver(3, 3, 1);
-        int[,] field = { { 0,0,0}, { 1, 1, 0 }, { 9, 1, 0 } };
-        Assert.IsTrue(solver.IsSolvable(field, 0, 0));
+        int[,] field = { { 0, 0, 0 }, { 1, 1, 0 }, { 9, 1, 0 } };
+        BoardSolver solver = new BoardSolver(new UnsolvedMineField(field));
+        Assert.IsTrue(solver.IsSolvable(0, 0));
     }
 
     // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use

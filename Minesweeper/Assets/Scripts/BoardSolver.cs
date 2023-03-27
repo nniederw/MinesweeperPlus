@@ -7,23 +7,24 @@ namespace Minesweeper
         private int SizeX;
         private int SizeY;
         private int Mines;
-        public BoardSolver(int sizeX, int sizeY, int mines)
+        private IUnsolvedMineField UnsolvedField;
+        public BoardSolver(IUnsolvedMineField unsolvedField)
         {
-            SizeX = sizeX;
-            SizeY = sizeY;
-            Mines = mines;
+            SizeX = unsolvedField.GetSizeX();
+            SizeY = unsolvedField.GetSizeY();
+            Mines = unsolvedField.GetMineCount();
+            UnsolvedField = unsolvedField;
         }
-        public bool IsSolvable(int seed, int startX, int startY)
-         => IsSolvable(Board.GenerateField(seed, SizeX, SizeY, Mines), startX, startY);
-        public bool IsSolvable(int[,] mineField, int startX, int startY)
+        //public bool IsSolvable(int seed, int startX, int startY)
+        // => IsSolvable(Board.GenerateField(seed, SizeX, SizeY, Mines), startX, startY);
+        public bool IsSolvable(int startX, int startY)
         {
             bool[,] clearSquares = new bool[SizeX, SizeY];
             bool[,] mines = new bool[SizeX, SizeY];
+            var mineField = UnsolvedField.RevealedNumbers();
             HashSet<(int x, int y)> active = new HashSet<(int x, int y)>();
-            if (mineField[startX, startY] == 9)
-            {
-                return false;
-            }
+            ClearSquare(startX, startY);
+            if (UnsolvedField.IsBlownUp()) return false;
             if (mineField[startX, startY] != 0)
             {
                 return AdjPos((startX, startY)).Count == Mines;
@@ -32,6 +33,7 @@ namespace Minesweeper
             bool changed = false;
             do
             {
+                changed = false;
                 var squares = active.ToList();
                 foreach (var s in squares)
                 {
@@ -68,7 +70,7 @@ namespace Minesweeper
                 if (!clearSquares[x, y])
                 {
                     clearSquares[x, y] = true;
-                    if (mineField[x, y] == 0)
+                    if (UnsolvedField.ClickSquare(x, y) == 0)
                     {
                         AdjPos((x, y)).ForEach(i => ClearSquare(i.Item1, i.Item2));
                         active.Remove((x, y));
@@ -77,6 +79,7 @@ namespace Minesweeper
                     {
                         AdjPos((x, y)).ForEach(CheckActive);
                     }
+                    CheckActive((x, y));
                 }
             }
             void CheckActive((int x, int y) pos)
