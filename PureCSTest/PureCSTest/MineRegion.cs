@@ -4,14 +4,14 @@ namespace Minesweeper
 {
     struct MineRegion
     {
-        public byte Mines;
+        public int Mines;
         public (int x, int y)[] Positions;
         public MineRegion()
         {
             Mines = 0;
             Positions = new (int x, int y)[0];
         }
-        public MineRegion(byte mines, (int x, int y)[] positions)
+        public MineRegion(int mines, (int x, int y)[] positions)
         {
             Mines = mines;
             Positions = positions; //todo make copy
