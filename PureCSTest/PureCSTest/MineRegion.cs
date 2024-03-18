@@ -6,6 +6,7 @@ namespace Minesweeper
     {
         public int Mines;
         public (int x, int y)[] Positions;
+        //TODO replace positions with set: public SortedSet<(int x, int y)>
         public MineRegion()
         {
             Mines = 0;
@@ -27,7 +28,7 @@ namespace Minesweeper
             return (result << 1) + Mines;
         }
         public bool Equals(MineRegion other)
-            => (Mines == other.Mines) && Positions.Intersect(other.Positions).Count() == Positions.Length;
+            => (Mines == other.Mines) && Positions.Length == other.Positions.Length && Positions.Intersect(other.Positions).Count() == Positions.Length;
         public static bool operator ==(MineRegion a, MineRegion b)
         => a.Equals(b);
         public static bool operator !=(MineRegion a, MineRegion b)
@@ -37,6 +38,6 @@ namespace Minesweeper
             if (this == other) return true;
             return Positions.Intersect(other.Positions).Count() == other.Positions.Length;
         }
-        public override bool Equals([NotNullWhen(true)] object? obj) => throw new Exception("Don't use this shitty thing");
+        public override bool Equals([NotNullWhen(true)] object? obj) => obj is MineRegion ? this == (MineRegion)obj : false; // throw new Exception("Don't use this shitty thing");
     }
 }

@@ -68,7 +68,7 @@ namespace Minesweeper
             //Phase 2
             foreach (var pos in Active)
             {
-                var reg = new MineRegion(Numbers[pos.x, pos.y], AdjUnknownPos(pos).ToArray());
+                var reg = AllNeighborRegion(pos);
                 AddRegion(reg);
             }
             List<MineRegion> newRegs = new List<MineRegion>();
@@ -77,21 +77,32 @@ namespace Minesweeper
                 newRegs.Clear();
                 foreach (var reg in Regions)
                 {
-                    foreach (var otherReg in Regions)
+                    foreach (var otherReg in Regions.Except(new[] { reg }))
                     {
-                        if (reg == otherReg) continue;
                         if (reg.Contains(otherReg))
                         {
                             var newReg = new MineRegion(reg.Mines - otherReg.Mines,
                                 reg.Positions.Except(otherReg.Positions).ToArray());
+                            if (Regions.Contains(newReg)) continue;
                             if (newReg.Mines == 0)
                             {
+                                foreach (var pos in newReg.Positions)
+                                {
+                                    ClearSquare(pos);
+                                    var anreg = AllNeighborRegion(pos);
+                                    if (!Regions.Contains(anreg))
+                                    {
+                                        newRegs.Add(anreg);
+                                    }
+                                }
                                 newReg.Positions.Foreach(ClearSquare);
                             }
-                            if (newReg.Positions.Length == 1)
+                            else if (newReg.Mines == newReg.Positions.Length)
                             {
-                                SetMine(newReg.Positions[0]);
-                                Ext.Assert(newReg.Mines == 1);
+                                foreach (var pos in newReg.Positions)
+                                {
+                                    SetMine(pos);
+                                }
                             }
                             else
                             {
@@ -101,10 +112,23 @@ namespace Minesweeper
                     }
                 }
                 newRegs.ForEach(i => Regions.Add(i));
+                CheckRegions();
             }
             while (newRegs.Any());
 
             return Active.Count == 0;
+        }
+        private MineRegion AllNeighborRegion((int x, int y) pos)
+            => new MineRegion(Numbers[pos.x, pos.y], AdjUnknownPos(pos).ToArray());
+        private void CheckRegions()
+        {
+            foreach (var reg in Regions)
+            {
+                if (!reg.Positions.TrueForOne(j => AdjPos(j).TrueForOne(Active.Contains)))
+                {
+                    Regions.Remove(reg);
+                }
+            }
         }
         private bool TestSquare((int x, int y) pos)
         {

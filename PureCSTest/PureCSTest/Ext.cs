@@ -14,6 +14,17 @@ public static class Ext
         foreach (var i in arr) { action(i); }
         return arr;
     }
+    public static bool TrueForOne<T>(this IEnumerable<T> list, Predicate<T> match)
+    {
+        foreach (var item in list)
+        {
+            if (match(item))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
     public static T[,] Foreach<T>(this T[,] arr, Action<T> action)
     {
         foreach (var i in arr) { action(i); }
