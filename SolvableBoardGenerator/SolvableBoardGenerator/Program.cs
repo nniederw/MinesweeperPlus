@@ -1,7 +1,7 @@
 ﻿using Minesweeper;
 
-//int[,] field;
-bool[,] field;
+int[,] field;
+//bool[,] field;
 /*
 field = {
             { 0, 0, 0 },
@@ -39,19 +39,22 @@ Ext.Assert(Test(field, 3, 2));
 Ext.Assert(Test(field, 3, 3));
 Ext.Assert(Test(field, 2, 1));
 */
+/*
+field = (new int[,] {
+            { 0, 1, 0 },
+            { 0, 0, 0 },
+            { 0, 0, 0 }});
+*/
 
-field = (new bool[,] {
-            { true, false, false },
-            { false,false,false },
-            { false,false,false }});
-Board board = new Board(field);
-SimpleBoardSolver solver = new SimpleBoardSolver(board);
-Console.WriteLine(solver.IsSolvable(0, 0));
-Console.WriteLine(solver.IsSolvable(0, 1));
-Console.WriteLine(solver.IsSolvable(0, 2));
-Console.WriteLine(solver.IsSolvable(1, 0));
-Console.WriteLine(solver.IsSolvable(1, 1));
-Console.WriteLine(solver.IsSolvable(1, 2));
-Console.WriteLine(solver.IsSolvable(2, 0));
-Console.WriteLine(solver.IsSolvable(2, 1));
-Console.WriteLine(solver.IsSolvable(2, 2));
+field = (new int[,] {
+            { 0, 0, 1, 1 },
+            { 0, 0, 0, 1 },
+            { 0, 0, 0, 0 },
+            { 0, 0, 0, 0 }});
+
+var bfield = BoardConverter.BinaryIntsToBools(field);
+Board board = new Board(bfield);
+BoardConverter.PrintBoolArray(bfield);
+Console.WriteLine();
+var solvables = BoardChecker.CheckBoard(board);
+BoardConverter.PrintBoolArray(solvables);
