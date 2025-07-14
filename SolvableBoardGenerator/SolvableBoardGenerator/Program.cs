@@ -50,7 +50,9 @@ field = (new int[,] {
             { 0, 0, 1, 1 },
             { 0, 0, 0, 1 },
             { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 }});
+            { 0, 0, 0, 0 },
+            { 0, 0, 1, 1 },
+            { 0, 0, 0, 1 }});
 
 var bfield = BoardConverter.BinaryIntsToBools(field);
 Board board = new Board(bfield);

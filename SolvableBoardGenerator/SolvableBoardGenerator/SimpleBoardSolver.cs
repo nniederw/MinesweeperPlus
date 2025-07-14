@@ -52,29 +52,19 @@ namespace Minesweeper
                 //Phase 2
                 var unopenedSquares = Board.AllSquares().Where(i => !IsOpenedSquare(i) && !IsSetMine(i)).ToList();
                 var relevantNumbers = unopenedSquares.SelectMany(i => Board.GetNeighbors(i).Prepend(i)).Where(i => IsOpenedSquare(i));
-                bool FoundInformation = false;
-                foreach (var square in unopenedSquares)
+                var determinableSquares = BruteforceSquares(unopenedSquares, relevantNumbers.ToList());
+                foreach (var square in determinableSquares)
                 {
-                    //Console.WriteLine($"Testing by bruteforcing square ({square.x}, {square.y})");
-                    bool? mine = SquareIsAMine(unopenedSquares, square, relevantNumbers.ToList());
-                    if (mine == null)
+                    if (square.mine)
                     {
-                        continue;
-                    }
-                    if (mine.Value)
-                    {
-                        SetMine(square);
-                        FoundInformation = true;
-                        break;
+                        SetMine(square.pos);
                     }
                     else
                     {
-                        ClickSquare(square);
-                        FoundInformation = true;
-                        break;
+                        ClickSquare(square.pos);
                     }
                 }
-                if (!FoundInformation) { break; }
+                if (!determinableSquares.Any()) { break; }
             }
             return Board.IsCleared();
         }
@@ -143,33 +133,46 @@ namespace Minesweeper
         /// <summary>
         /// returns true if square is a guaranteed a mine, false if it is guaranteed not a mine, null if it can be either with the current information.
         /// </summary>
-        private bool? SquareIsAMine(List<(int x, int y)> unopenedSquares, (int x, int y) pos, List<(int x, int y)> relevantNumbers)
+        private List<((int x, int y) pos, bool mine)> BruteforceSquares(List<(int x, int y)> unopenedSquares, List<(int x, int y)> relevantNumbers)
         {
-            int permutationsTested = 0;
             int validPermutationsTested = 0;
-            bool? result = null;
-            foreach (var permutation in Combinatorics.GetCombinationsIterative(unopenedSquares, MineCount))
+            bool?[,] result = new bool?[Board.SizeX, Board.SizeY];
+            var validPermuts = Combinatorics.GetCombinationsIterative(unopenedSquares, MineCount).Where(i => ValidPermutation(relevantNumbers, i));
+            bool firstTime = true;
+            foreach (var permutation in validPermuts)
             {
+                var permuteHash = permutation.ToHashSet();
                 //Console.WriteLine($"permutationsTested: {permutationsTested}, validPermutationsTested: {validPermutationsTested}");
-                permutationsTested++;
-                if (ValidPermutation(relevantNumbers, permutation))
+                validPermutationsTested++;
+                if (firstTime)
                 {
-                    validPermutationsTested++;
-                    bool posMine = permutation.Contains(pos);
-                    if (result == null)
+                    foreach (var pos in unopenedSquares)
                     {
-                        result = posMine;
+                        result[pos.x, pos.y] = permuteHash.Contains(pos);
                     }
-                    else
+                    firstTime = false;
+                    continue;
+                }
+                foreach (var pos in unopenedSquares)
+                {
+                    if (result[pos.x, pos.y] != null)
                     {
-                        if (result != posMine)
+                        if (result[pos.x, pos.y] != permuteHash.Contains(pos))
                         {
-                            return null;
+                            result[pos.x, pos.y] = null;
                         }
                     }
                 }
             }
-            return result;
+            List<((int x, int y) pos, bool mine)> res = new();
+            foreach (var pos in unopenedSquares)
+            {
+                if (result[pos.x, pos.y] != null)
+                {
+                    res.Add((pos, result[pos.x, pos.y].Value));
+                }
+            }
+            return res;
         }
         private bool ValidPermutation(List<(int x, int y)> relevantNumbers, List<(int x, int y)> permutationMines)
         {
