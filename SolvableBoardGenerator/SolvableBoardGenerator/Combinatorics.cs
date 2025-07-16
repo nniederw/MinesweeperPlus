@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-public static class Combinatorics
+﻿public static class Combinatorics
 {
     /// <summary>
     /// Iteratively generates all combinations of size k from source[0..n-1].
