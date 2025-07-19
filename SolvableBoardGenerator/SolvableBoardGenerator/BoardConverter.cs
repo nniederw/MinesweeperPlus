@@ -1,4 +1,6 @@
-﻿namespace Minesweeper
+﻿using System.Drawing;
+
+namespace Minesweeper
 {
     public static class BoardConverter
     {
@@ -23,6 +25,20 @@
                 for (int x = 0; x < arr.GetLength(0); x++)
                 {
                     Console.Write(arr[x, y] ? 1 : 0);
+                }
+                Console.WriteLine();
+            }
+        }
+        public static void PrettyPrintBoard(Board board, bool[,] solvability)
+        {
+            var numbers = board.CheatGetNumbers();
+            for (int y = 0; y < solvability.GetLength(1); y++)
+            {
+                for (int x = 0; x < solvability.GetLength(0); x++)
+                {
+                    var n = numbers[x, y];
+                    ConsoleColor? cc = n == 9 ? null : solvability[x, y] ? ConsoleColor.DarkGreen : ConsoleColor.DarkRed;
+                    Ext.ConsoleWriteColor(n == 9 ? "X" : n.ToString(), cc);
                 }
                 Console.WriteLine();
             }

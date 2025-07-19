@@ -15,5 +15,20 @@
             }
             return result;
         }
+        public static void BoardBenchmarker()
+        {
+            TimeSpan totalTime = TimeSpan.Zero;
+            uint solvedBoards = 0;
+            for (int i = 0; i < 100; i++)
+            {
+                var bboard = BoardGenerator.GetRandomSeededBoard(6, 6, 4, i);
+                var board = new Board(bboard);
+                DateTime startTime = DateTime.Now;
+                CheckBoard(board);
+                totalTime += DateTime.Now - startTime;
+                solvedBoards++;
+                Console.WriteLine($"About {solvedBoards / totalTime.TotalSeconds} Boards solved per second.");
+            }
+        }
     }
 }

@@ -74,6 +74,7 @@
                 }
             }
         }
+        public sbyte[,] CheatGetNumbers() => NumberField;
         private uint CalcMines()
         {
             uint mines = 0;

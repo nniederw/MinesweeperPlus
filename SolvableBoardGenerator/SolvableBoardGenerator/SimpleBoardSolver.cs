@@ -50,7 +50,7 @@ namespace Minesweeper
                 //Phase 2
                 var unopenedSquares = Board.AllSquares().Where(i => !IsOpenedSquare(i) && !IsSetMine(i)).ToList();
                 var relevantNumbers = unopenedSquares.SelectMany(i => Board.GetNeighbors(i).Prepend(i)).Where(i => IsOpenedSquare(i));
-                var determinableSquares = BruteforceSquares(unopenedSquares, relevantNumbers.ToList());
+                var determinableSquares = BruteForceSquares(unopenedSquares, relevantNumbers.ToList(), MineCount);
                 foreach (var square in determinableSquares)
                 {
                     if (square.mine)
@@ -129,13 +129,13 @@ namespace Minesweeper
         private bool IsSetMine(int x, int y) => DiscoveredMines[x, y];
         private bool IsSetMine((int x, int y) pos) => IsSetMine(pos.x, pos.y);
         /// <summary>
-        /// returns true if square is a guaranteed a mine, false if it is guaranteed not a mine, null if it can be either with the current information.
+        /// returns true if square is a guaranteed a mine, false if it is guaranteed not a mine.
         /// </summary>
-        private List<((int x, int y) pos, bool mine)> BruteforceSquares(List<(int x, int y)> unopenedSquares, List<(int x, int y)> relevantNumbers)
+        private List<((int x, int y) pos, bool mine)> BruteForceSquares(List<(int x, int y)> unopenedSquares, List<(int x, int y)> relevantNumbers, uint mineCount)
         {
             int validPermutationsTested = 0;
             bool?[,] result = new bool?[Board.SizeX, Board.SizeY];
-            var validPermuts = Combinatorics.GetCombinationsIterative(unopenedSquares, MineCount).Where(i => ValidPermutation(relevantNumbers, i));
+            var validPermuts = Combinatorics.GetCombinationsIterative(unopenedSquares, mineCount).Where(i => ValidPermutation(relevantNumbers, i));
             bool firstTime = true;
             foreach (var permutation in validPermuts)
             {
@@ -164,6 +164,80 @@ namespace Minesweeper
             }
             List<((int x, int y) pos, bool mine)> res = new();
             foreach (var pos in unopenedSquares)
+            {
+                if (result[pos.x, pos.y] != null)
+                {
+                    res.Add((pos, result[pos.x, pos.y].Value));
+                }
+            }
+            return res;
+        }
+
+        /// <summary>
+        /// returns true if square is a guaranteed a mine, false if it is guaranteed not a mine.
+        /// This function may also just give minecount info instead of whole determinable squares.
+        /// </summary>
+        private List<((int x, int y) pos, bool mine)> BruteforceSquaresSeparationAlgo(List<(int x, int y)> unopenedSquares, List<(int x, int y)> relevantNumbers)
+        {
+            //todo, consider that 1 2 are possible, 3 not, 4 possible again. aka check ever number between 1 & MineCount.
+            bool?[,] result = new bool?[Board.SizeX, Board.SizeY];
+            var relavantNumbHash = relevantNumbers.ToHashSet();
+            var relevantUnopSquares = unopenedSquares.Where(relavantNumbHash.Contains).ToList();
+            var restUnopSquares = unopenedSquares.Where(i => !relavantNumbHash.Contains(i)).ToList();
+            IEnumerable<List<(int x, int y)>>[] enumerables = new IEnumerable<List<(int x, int y)>>[MineCount]; //index i stands for i + 1 mines
+            bool[] anyValidPerm = new bool[MineCount]; //index i stands for i + 1 mines
+            for (uint i = 1; i <= MineCount; i++)
+            {
+                var perm = Combinatorics.GetCombinationsIterative(relevantUnopSquares, i).Where(i => ValidPermutation(relevantNumbers, i));
+                enumerables[i - 1] = new PartiallyMaterializedEnumerable<List<(int x, int y)>>(perm, 1).GetEnumerable();
+                anyValidPerm[i - 1] = enumerables[i - 1].Any();
+            }
+            if (anyValidPerm.Count(i => i) == 1)
+            {
+                uint EdgeMineCount = 0;
+                for (uint i = 0; i < MineCount; i++)
+                {
+                    if (anyValidPerm[i])
+                    {
+                        EdgeMineCount = i + 1;
+                        break;
+                    }
+                }
+                if (EdgeMineCount == MineCount)
+                {
+                    return restUnopSquares.Select(i => (i, false)).ToList();
+                }
+                return BruteForceSquares(relevantUnopSquares, relevantNumbers, EdgeMineCount); //Todo possible optimisations from having 1 valid permutation already computed.
+            }
+            bool firstTime = true;
+            foreach (var enumerable in enumerables.Where(i => i.Any()))
+            {
+                foreach (var permutation in enumerable)
+                {
+                    var permuteHash = permutation.ToHashSet();
+                    if (firstTime)
+                    {
+                        foreach (var pos in relevantUnopSquares)
+                        {
+                            result[pos.x, pos.y] = permuteHash.Contains(pos);
+                        }
+                        firstTime = false;
+                        continue;
+                    }
+                    foreach (var pos in relevantUnopSquares)
+                    {
+                        if (result[pos.x, pos.y] != null)
+                        {
+                            if (result[pos.x, pos.y] != permuteHash.Contains(pos))
+                            {
+                                result[pos.x, pos.y] = null;
+                            }
+                        }
+                    }
+                }
+            }
+            List<((int x, int y) pos, bool mine)> res = new();
+            foreach (var pos in relevantUnopSquares)
             {
                 if (result[pos.x, pos.y] != null)
                 {

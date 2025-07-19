@@ -104,4 +104,20 @@ public static class Ext
         }
         return res;
     }
+    public static void ConsoleWriteColor(string msg, ConsoleColor? backColor = null, ConsoleColor? forColor = null)
+    {
+        var oldbc = Console.BackgroundColor;
+        var oldfc = Console.ForegroundColor;
+        if (backColor != null)
+        {
+            Console.BackgroundColor = backColor.Value;
+        }
+        if (forColor != null)
+        {
+            Console.ForegroundColor = forColor.Value;
+        }
+        Console.Write(msg);
+        Console.BackgroundColor = oldbc;
+        Console.ForegroundColor = oldfc;
+    }
 }
