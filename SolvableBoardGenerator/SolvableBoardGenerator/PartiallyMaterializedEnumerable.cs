@@ -3,6 +3,7 @@
     private List<T> MaterialzedPart = new();
     private IEnumerator<T> Rest;
     private bool HasAdvancedToRest = false;
+    private bool IsEmpty = false;
     public PartiallyMaterializedEnumerable(IEnumerable<T> sequence, uint materializeQuantity)
     {
         IEnumerator<T> enumerator = sequence.GetEnumerator();
@@ -18,9 +19,14 @@
             }
         }
         Rest = enumerator;
+        if (materializeQuantity > 0 && MaterialzedPart.Count == 0)
+        {
+            IsEmpty = true;
+        }
     }
     public IEnumerable<T> GetEnumerable()
     {
+        if (IsEmpty) { yield break; }
         foreach (var item in MaterialzedPart)
         {
             yield return item;

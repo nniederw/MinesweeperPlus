@@ -54,4 +54,62 @@ foreach (var board in boards)
     //BoardConverter.PrintBoolArray(solvables);
     Console.WriteLine();
 }*/
-BoardChecker.BoardBenchmarker();
+//BoardChecker.BoardBenchmarker(true);
+
+//BoardChecker.SolverTester(true);
+/*
+Board board = new Board(BoardGenerator.GetRandomSeededBoard(4, 4, 3, 18));
+BoardConverter.PrettyPrintBoard(board);
+var s = BoardChecker.CheckBoard(board);
+var s2 = BoardChecker.CheckBoard(board, true);
+BoardConverter.PrettyPrintBoard(board,s);
+Console.WriteLine();
+BoardConverter.PrettyPrintBoard(board,s2);
+*/
+
+//Board board = new Board(BoardGenerator.GetRandomSeededBoard(20, 30, 99, 0));
+const uint width = 8;
+const uint height = 8;
+const uint mines = 10;
+int[,] solvableScore = new int[16, 16];
+for (int i = 0; i < 5000000; i++)
+{
+    var bboard = BoardGenerator.GetRandomSeededBoard(width, height, mines, i);
+    Board board = new Board(bboard);
+    //BoardConverter.PrettyPrintBoard(board);
+    var solvable = BoardChecker.CheckBoard(board, true);
+    for (int x = 0; x < width; x++)
+    {
+        for (int y = 0; y < height; y++)
+        {
+            if (bboard[x, y]) { continue; }
+            solvableScore[x, y] += solvable[x, y] ? 1 : -1;
+        }
+    }
+
+    if (i % 30 == 0)
+    {
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                Console.Write($"{solvableScore[x, y]},");
+            }
+            Console.WriteLine();
+        }
+    }
+    //BoardConverter.PrettyPrintBoard(board, solvable);
+    Console.WriteLine($"Checked board {i}");
+
+}
+Console.WriteLine("End reached");
+for (int x = 0; x < width; x++)
+{
+    for (int y = 0; y < height; y++)
+    {
+        Console.Write($"{solvableScore[x, y]},");
+    }
+    Console.WriteLine();
+}
+
+var wait = Console.ReadLine();

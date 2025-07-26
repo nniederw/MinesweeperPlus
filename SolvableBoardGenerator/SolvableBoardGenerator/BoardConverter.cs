@@ -29,6 +29,19 @@ namespace Minesweeper
                 Console.WriteLine();
             }
         }
+        public static void PrettyPrintBoard(Board board)
+        {
+            var numbers = board.CheatGetNumbers();
+            for (int y = 0; y < board.SizeY; y++)
+            {
+                for (int x = 0; x < board.SizeX; x++)
+                {
+                    var n = numbers[x, y];
+                    Console.Write(n == 9 ? "X" : n.ToString());
+                }
+                Console.WriteLine();
+            }
+        }
         public static void PrettyPrintBoard(Board board, bool[,] solvability)
         {
             var numbers = board.CheatGetNumbers();
