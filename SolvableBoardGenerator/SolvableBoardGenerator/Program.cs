@@ -68,11 +68,11 @@ BoardConverter.PrettyPrintBoard(board,s2);
 */
 
 //Board board = new Board(BoardGenerator.GetRandomSeededBoard(20, 30, 99, 0));
-const uint width = 8;
-const uint height = 8;
-const uint mines = 10;
+const uint width = 16;
+const uint height = 16;
+const uint mines = 25;
 int[,] solvableScore = new int[16, 16];
-for (int i = 0; i < 5000000; i++)
+for (int i = 100030; i < 5000000; i++)
 {
     var bboard = BoardGenerator.GetRandomSeededBoard(width, height, mines, i);
     Board board = new Board(bboard);
@@ -98,7 +98,9 @@ for (int i = 0; i < 5000000; i++)
             Console.WriteLine();
         }
     }
-    //BoardConverter.PrettyPrintBoard(board, solvable);
+    BoardConverter.PrettyPrintBoard(board, solvable);
+    Console.WriteLine("Press enter to continue");
+    Console.ReadLine();
     Console.WriteLine($"Checked board {i}");
 
 }
