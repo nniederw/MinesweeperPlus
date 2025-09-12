@@ -104,6 +104,7 @@ public static class Ext
         }
         return res;
     }
+    public static IEnumerable<(A, B)> CartesianProduct<A, B>(this IEnumerable<A> aElements, IEnumerable<B> bElements) => aElements.SelectMany(a => bElements, (a, b) => (a, b));
     public static void ConsoleWriteColor(string msg, ConsoleColor? backColor = null, ConsoleColor? forColor = null)
     {
         var oldbc = Console.BackgroundColor;

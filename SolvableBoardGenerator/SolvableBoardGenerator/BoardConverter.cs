@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace Minesweeper
+﻿namespace Minesweeper
 {
     public static class BoardConverter
     {

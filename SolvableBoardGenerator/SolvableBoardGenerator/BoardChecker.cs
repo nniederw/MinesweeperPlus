@@ -2,15 +2,33 @@
 {
     public class BoardChecker
     {
-        public static bool[,] CheckBoard(Board board, bool fastBruteForce = false, bool printProgress = false)
+        public static bool[,] CheckBoard(Board board, bool printProgress = false)
         {
-            var sbs = new SimpleBoardSolver(board);
+            var sbs = new EdgeBruteForceBoardSolver(board);
             var result = new bool[board.SizeX, board.SizeY];
             for (int x = 0; x < board.SizeX; x++)
             {
                 for (int y = 0; y < board.SizeY; y++)
                 {
-                    result[x, y] = sbs.IsSolvable(x, y, fastBruteForce);
+                    result[x, y] = sbs.IsSolvable(x, y);
+                    if (printProgress)
+                    {
+                        var s = result[x, y] ? "solvable" : "not solvable";
+                        Console.WriteLine($"Found square ({x},{y}) to be {s}.");
+                    }
+                }
+            }
+            return result;
+        }
+        public static bool[,] CheckBoard<BoardSolver>(Board board, bool printProgress = false) where BoardSolver : BaseBoardSolver, new()
+        {
+            var sbs = new BoardSolver().Construct(board);
+            var result = new bool[board.SizeX, board.SizeY];
+            for (int x = 0; x < board.SizeX; x++)
+            {
+                for (int y = 0; y < board.SizeY; y++)
+                {
+                    result[x, y] = sbs.IsSolvable(x, y);
                     if (printProgress)
                     {
                         var s = result[x, y] ? "solvable" : "not solvable";
@@ -42,6 +60,77 @@
                     Console.WriteLine();
                 }
                 Console.WriteLine($"About {solvedBoards / totalTime.TotalSeconds} Boards solved per second.");
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>True if both solvers gave the same output.</returns>
+        public static bool SameSolvabilityTesterForSolvers<TestSolver, CompleteSolver>(Board board, bool printBoards = false) where TestSolver : BaseBoardSolver, new() where CompleteSolver : BaseBoardSolver, new()
+        {
+            //IBoardSolver testSolver = new TestSolver().Construct(board);
+            IBoardSolver completeSolver = new CompleteSolver().Construct(board);
+            if (completeSolver is BaseBoardSolver && ((BaseBoardSolver)completeSolver).GetSolvabilityClass != SolvabilityClass.Complete)
+            {
+                Console.WriteLine($"Comparing Solvability with a Solver that doesn't claim to be in the {nameof(SolvabilityClass)}.{nameof(SolvabilityClass.Complete)}, which is odd.");
+            }
+            var solvable = CheckBoard<TestSolver>(board);
+            var solvable2 = CheckBoard<CompleteSolver>(board);
+            bool different = false;
+            for (int x = 0; x < board.SizeX; x++)
+            {
+                for (int y = 0; y < board.SizeY; y++)
+                {
+                    if (solvable[x, y] != solvable2[x, y])
+                    {
+                        different = true;
+                        Console.WriteLine($"Differnent solvability for solvers at ({x},{y})");
+                    }
+                }
+            }
+            if (printBoards && different)
+            {
+                Console.WriteLine($"{typeof(TestSolver).FullName}");
+                BoardConverter.PrettyPrintBoard(board, solvable);
+                Console.WriteLine();
+                Console.WriteLine($"{typeof(CompleteSolver).FullName}");
+                BoardConverter.PrettyPrintBoard(board, solvable2);
+                Console.WriteLine();
+            }
+            return !different;
+        }
+        public static void SolverTester<TestSolver, CompleteSolver>(bool printBoards = false) where TestSolver : BaseBoardSolver, new() where CompleteSolver : BaseBoardSolver, new()
+        {
+            bool foundDifference = false;
+            uint completBoardTestCount = 0;
+            foreach (var board in BoardGenerator.GetAllBoardsUpToSize(3, 3).Select(i => new Board(i)))
+            {
+                bool good = SameSolvabilityTesterForSolvers<TestSolver, CompleteSolver>(board, printBoards);
+                if (!good)
+                {
+                    Console.WriteLine($"Board has different solvability for a board with values {board.SizeX},{board.SizeY},{board.Mines}.");
+                    foundDifference = true;
+                }
+                Console.WriteLine($"Checked a total of {completBoardTestCount} boards so far, current size ({board.SizeX},{board.SizeY},{board.Mines})");
+                completBoardTestCount++;
+            }
+            Console.WriteLine($"Finished with complete check boards, continueing with random boards.");
+            const uint RandomTestCount = 200;
+            for (int i = 0; i < RandomTestCount; i++)
+            {
+                var bboard = BoardGenerator.GetRandomSeededBoard(5, 5, 4, i);
+                var board = new Board(bboard);
+                bool good = SameSolvabilityTesterForSolvers<TestSolver, CompleteSolver>(board, printBoards);
+                if (!good)
+                {
+                    Console.WriteLine($"Board has different solvability for random seeded board with values {board.SizeX},{board.SizeY},{board.Mines}, seed {i}.");
+                    foundDifference = true;
+                }
+                Console.WriteLine($"Checked a total of {i} random boards so far, current size ({board.SizeX},{board.SizeY},{board.Mines}).");
+            }
+            if (!foundDifference)
+            {
+                Console.WriteLine($"Didn't find any different solvability in {RandomTestCount + completBoardTestCount} tested boards.");
             }
         }
         public static void SolverTester(bool printBoards = false)

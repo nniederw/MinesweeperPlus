@@ -103,4 +103,29 @@
             }
         }
     }
+    /// <summary>
+    /// Returns 
+    /// </summary>
+    public static IEnumerable<(uint a, uint b)> AllDouble32bNaturalNumbers()
+    {
+        uint a = 0;
+        uint b = 0;
+        yield return (a, b);
+        while (a < uint.MaxValue)
+        {
+            if (a == 0)
+            {
+                a = b + 1;
+                b = 0;
+            }
+            else
+            {
+                a--;
+                b++;
+            }
+            yield return (a, b);
+        }
+    }
+    public static IEnumerable<(uint a, uint b)> AllDouble32bNaturalNumbersGreaterThan(uint n)
+        => AllDouble32bNaturalNumbers().Where((i) => i.a > n && i.b > n);
 }
