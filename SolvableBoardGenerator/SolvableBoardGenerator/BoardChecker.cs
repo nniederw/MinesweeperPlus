@@ -2,6 +2,20 @@
 {
     public class BoardChecker
     {
+        public static (int x, int y) FindFirstZero(Board board)
+        {
+            for (int x = 0; x < board.SizeX; x++)
+            {
+                for (int y = 0; y < board.SizeY; y++)
+                {
+                    if (board.CheatGetNumbers()[x, y] == 0)
+                    {
+                        return (x, y);
+                    }
+                }
+            }
+            return (0, 0);
+        }
         public static bool[,] CheckBoard(Board board, bool printProgress = false)
         {
             var sbs = new EdgeBruteForceBoardSolver(board);

@@ -21,7 +21,9 @@ namespace Minesweeper
         protected HashSet<(int x, int y)> ActiveNumbers = new HashSet<(int x, int y)>();
         protected HashSet<(int x, int y)> ActiveUnopenedSquares = new HashSet<(int x, int y)>();
         protected bool VerboseLogging = false;
+        protected bool VerboseLoggingDuringPhasesForceDisable = false;
         public uint SquaresCleared { get; private set; }
+        public double PercentageCleared => ((double)SquaresCleared) / Board.SizeX / Board.SizeY * 100.0;
         public BaseBoardSolver() { SquaresCleared = 0; }
         public BaseBoardSolver(Board board, bool verboseLogging = false)
         {
@@ -42,6 +44,7 @@ namespace Minesweeper
             }
             VerboseLogging = verboseLogging;
         }
+        public void DisableAutoLoggingDuringPhases() => VerboseLoggingDuringPhasesForceDisable = true;
         public abstract IBoardSolver Construct(Board board, bool verboseLogging = false);
         public virtual SolvabilityClass GetSolvabilityClass => SolvabilityClass.Unknown;
         private static void TestConstruct<T>(Board board) where T : BaseBoardSolver
@@ -81,7 +84,7 @@ namespace Minesweeper
             while (!Board.IsCleared())
             {
                 bool progress = false;
-                if (VerboseLogging)
+                if (VerboseLogging && !VerboseLoggingDuringPhasesForceDisable)
                 {
                     PrintCurrentStateBoard();
                 }
@@ -97,7 +100,7 @@ namespace Minesweeper
             }
             if (VerboseLogging)
             {
-                Console.WriteLine("Last state of board:");
+                Console.WriteLine($"Last state of board (cleared {PercentageCleared}%):");
                 PrintCurrentStateBoard();
             }
             return Board.IsCleared();
@@ -121,6 +124,7 @@ namespace Minesweeper
         }
         protected void ResetSolver()
         {
+            SquaresCleared = 0;
             Board.ResetBoard();
             MineCount = Board.Mines;
             for (int x = 0; x < Board.SizeX; x++)
@@ -166,15 +170,21 @@ namespace Minesweeper
             {
                 DiscoveredMines[x, y] = true;
                 MineCount--;
+                SquaresCleared++;
             }
             ActiveUnopenedSquares.Remove((x, y));
         }
         protected void SetMine((int x, int y) pos) => SetMine(pos.x, pos.y);
         protected void ClickSquare(int x, int y)
         {
+            if (DiscoveredNumbers[x,y] != UndiscoveredNumber)
+            {
+                return;
+            }
             DiscoveredNumbers[x, y] = Board.ClickOnSquare(x, y);
             ActiveNumbers.Add((x, y));
             Board.GetNeighbors(x, y).Where(i => !IsOpenedSquare(i) && !IsSetMine(i)).Foreach(i => ActiveUnopenedSquares.Add(i));
+            SquaresCleared++;
         }
         protected void ClickSquare((int x, int y) pos) => ClickSquare(pos.x, pos.y);
         protected bool IsOpenedSquare(int x, int y) => DiscoveredNumbers[x, y] != UndiscoveredNumber;

@@ -80,52 +80,59 @@ Console.OutputEncoding = System.Text.Encoding.UTF8;
 //var t = DateTime.Now;
 //fastSolver.IsSolvable(15, 0);
 //Console.WriteLine($"Took {(DateTime.Now-t).TotalMilliseconds}ms to finish the board.");
-for (int i = 0; i < 20; i++)
+//224, 1136, 1624, 1755, 1799 run out of memory
+//10424 runs out of memory despite break early point of 25
+List<string> solvableBoards = new List<string>();
+for (int i = 21569; i < 1000000; i++)
 {
-    Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(100, 100, 2100), 0);
-    PermutationBuilderBoardSolver pSolver = new PermutationBuilderBoardSolver(b);
+    Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(100, 100, 2100), i);
+    //BoardConverter.PrettyPrintBoard(b);
+    SmartPermutationBuilderBoardSolver pSolver = new SmartPermutationBuilderBoardSolver(b, false);
+    pSolver.SetBreakEarlyLogicChain(25);
+    pSolver.SetMaxMergablePermutationCount(100000);
+    pSolver.DisableAutoLoggingDuringPhases();
     var time = DateTime.Now;
-    bool solvableFromCurPos = pSolver.IsSolvable(0, 0);
+    int x, y;
+    (x, y) = BoardChecker.FindFirstZero(b);
+    bool solvableFromCurPos = pSolver.IsSolvable(x, y);
     var solveTime = DateTime.Now - time;
     if (solvableFromCurPos)
     {
-        Console.WriteLine($"Board {i} is solvable at ({0},{0}), solved in {solveTime.TotalMilliseconds}ms:");
+        solvableBoards.Add($"Board {i} is solvable at ({x},{y}), solved in {solveTime.TotalMilliseconds}ms.");
+        Console.WriteLine();
+        foreach (string s in solvableBoards)
+        {
+            Ext.ConsoleWriteColor(s, ConsoleColor.Red);
+            Console.WriteLine();
+        }
+        Console.WriteLine();
+        Console.WriteLine();
     }
     else
     {
-        Console.WriteLine($"Board {i} isn't solvable at ({0},{0}), finished in {solveTime.TotalMilliseconds}ms:");
+        Console.WriteLine($"Board {i} isn't solvable at ({x},{y}), finished in {solveTime.TotalMilliseconds}ms. Was able to clear {pSolver.PercentageCleared}%");
     }
 }
-for (int i = 0; i < 2000; i++)
+/*
+for (int i = 3; i < 2000; i++)
 {
     Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(100, 100, 2100), i);
-    bool breaking = false;
-    for (int x = 0; x < b.SizeX; x++)
+    int x, y;
+    (x, y) = BoardChecker.FindFirstZero(b);
+    SmartPermutationBuilderBoardSolver pSolver = new SmartPermutationBuilderBoardSolver(b, true);
+    pSolver.DisableAutoLoggingDuringPhases();
+    var time = DateTime.Now;
+    bool solvableFromCurPos = pSolver.IsSolvable(x, y);
+    var solveTime = DateTime.Now - time;
+    if (solvableFromCurPos)
     {
-        for (int y = 0; y < b.SizeY; y++)
-        {
-            if (b.CheatGetNumbers()[x, y] == 0)
-            {
-                breaking = true;
-                PermutationBuilderBoardSolver pSolver = new PermutationBuilderBoardSolver(b);
-                var time = DateTime.Now;
-                bool solvableFromCurPos = pSolver.IsSolvable(x, y);
-                var solveTime = DateTime.Now - time;
-                if (solvableFromCurPos)
-                {
-                    Console.WriteLine($"Board {i} is solvable at ({x},{y}), solved in {solveTime.TotalMilliseconds}ms:");
-                    //BoardConverter.PrettyPrintBoard(b);
-                    //var pS = new PermutationBuilderBoardSolver(b, true);
-                    //pS.IsSolvable(x, y);
-                    break;
-                }
-                Console.WriteLine($"Board {i} isn't solvable at ({x},{y}), finished in {solveTime.TotalMilliseconds}ms:");
-                break;
-            }
-        }
-        if (breaking) { break; }
+        Console.WriteLine($"Board {i} is solvable at ({x},{y}), solved in {solveTime.TotalMilliseconds}ms:");
+        //BoardConverter.PrettyPrintBoard(b);
+        //var pS = new PermutationBuilderBoardSolver(b, true);
+        //pS.IsSolvable(x, y);
     }
-}
+    Console.WriteLine($"Board {i} isn't solvable at ({x},{y}), finished in {solveTime.TotalMilliseconds}ms:");
+}*/
 
 /*for (int i = 0; i < 2000; i++)
 {
