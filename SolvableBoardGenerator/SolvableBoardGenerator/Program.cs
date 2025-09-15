@@ -80,24 +80,81 @@ Console.OutputEncoding = System.Text.Encoding.UTF8;
 //var t = DateTime.Now;
 //fastSolver.IsSolvable(15, 0);
 //Console.WriteLine($"Took {(DateTime.Now-t).TotalMilliseconds}ms to finish the board.");
+
+//for: Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(100, 100, 2100), i);
 //224, 1136, 1624, 1755, 1799 run out of memory
 //10424 runs out of memory despite break early point of 25
-List<string> solvableBoards = new List<string>();
-for (int i = 21569; i < 1000000; i++)
+
+List<((int x, int y) pos, int seed)> SolvableBoards = new List<((int x, int y) pos, int seed)> {
+((0,0),121),
+((0,3),3828),
+((0,0),7865),
+((0,0),9415),
+((0,2),14399),
+((0,0),15548),
+((0,3),16629),
+((0,4),30775),
+((0,0),31799),
+((0,0),35750),
+((0,5),38850),
+((0,3),42540),
+((0,0),54338),
+((0,0),56017),
+((0,8),58892),
+((0,0),68689),
+((0,0),70812),
+};
+SolvableBoards.Clear();
+foreach (var solvabel in SolvableBoards)
 {
-    Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(100, 100, 2100), i);
+    Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(100, 100, 2100), solvabel.seed);
+    int x, y;
+    (x, y) = solvabel.pos;
+    SmartPermutationBuilderBoardSolver pSolver = new SmartPermutationBuilderBoardSolver(b, false);
+    var time = DateTime.Now;
+    bool solvableFromCurPos = pSolver.IsSolvable(x, y);
+    var solveTime = DateTime.Now - time;
+    EfficientSmartPermutationBuilderBoardSolver epSolver = new EfficientSmartPermutationBuilderBoardSolver(b, false);
+    time = DateTime.Now;
+    bool solvableFromCurPos2 = epSolver.IsSolvable(x, y);
+    var solveTime2 = DateTime.Now - time;
+    Console.WriteLine($"Solvetime Normal: {solveTime.TotalMilliseconds}ms, solvetime efficient: {solveTime2.TotalMilliseconds}ms, solvable normal: {solvableFromCurPos}, solvable efficient: {solvableFromCurPos2}");
+}
+List<string> solvableBoards = new List<string>();
+for (int i = 0; i < int.MaxValue; i++)
+{
+    Board b = BoardGenerator.GetRandomSeededBoard(BoardType.Expert, i);
+    //Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(100, 100, 2100), i);
     //BoardConverter.PrettyPrintBoard(b);
     SmartPermutationBuilderBoardSolver pSolver = new SmartPermutationBuilderBoardSolver(b, false);
     pSolver.SetBreakEarlyLogicChain(25);
     pSolver.SetMaxMergablePermutationCount(100000);
     pSolver.DisableAutoLoggingDuringPhases();
-    var time = DateTime.Now;
     int x, y;
     (x, y) = BoardChecker.FindFirstZero(b);
+    //SmartPermutationBuilderBoardSolver pSolver = new SmartPermutationBuilderBoardSolver(b, false);
+    var time = DateTime.Now;
     bool solvableFromCurPos = pSolver.IsSolvable(x, y);
     var solveTime = DateTime.Now - time;
+    EfficientSmartPermutationBuilderBoardSolver epSolver = new EfficientSmartPermutationBuilderBoardSolver(b, false);
+    epSolver.DisableAutoLoggingDuringPhases();
+    time = DateTime.Now;
+    bool solvableFromCurPos2 = epSolver.IsSolvable(x, y);
+    var solveTime2 = DateTime.Now - time;
+    var str = $"[{i}] Solvetime Normal: {solveTime.TotalMilliseconds}ms, solvetime efficient: {solveTime2.TotalMilliseconds}ms, solvable normal: {solvableFromCurPos}, solvable efficient: {solvableFromCurPos2}";
+    if (solvableFromCurPos != solvableFromCurPos2 || solveTime2 > solveTime)
+    {
+        //Ext.ConsoleWriteColor(str, ConsoleColor.Red);
+        //Console.WriteLine();
+    }
+    else
+    {
+        //Console.WriteLine(str);
+    }
     if (solvableFromCurPos)
     {
+        Console.WriteLine($"{i}, ({x},{y}) is solvable.");
+        /*
         solvableBoards.Add($"Board {i} is solvable at ({x},{y}), solved in {solveTime.TotalMilliseconds}ms.");
         Console.WriteLine();
         foreach (string s in solvableBoards)
@@ -106,11 +163,11 @@ for (int i = 21569; i < 1000000; i++)
             Console.WriteLine();
         }
         Console.WriteLine();
-        Console.WriteLine();
+        Console.WriteLine();*/
     }
     else
     {
-        Console.WriteLine($"Board {i} isn't solvable at ({x},{y}), finished in {solveTime.TotalMilliseconds}ms. Was able to clear {pSolver.PercentageCleared}%");
+        //Console.WriteLine($"Board {i} isn't solvable at ({x},{y}), finished in {solveTime.TotalMilliseconds}ms. Was able to clear {pSolver.PercentageCleared}%");
     }
 }
 /*

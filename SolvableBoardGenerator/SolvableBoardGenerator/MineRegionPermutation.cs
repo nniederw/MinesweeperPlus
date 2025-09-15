@@ -1,9 +1,10 @@
-﻿namespace Minesweeper
+﻿using System.Collections;
+
+namespace Minesweeper
 {
     public class MineRegionPermutation
     {
         private IReadOnlyList<Dictionary<(int x, int y), bool>> Permutations;
-        //private Dictionary<(int x, int y), bool> IndexLookupTable;
         private bool VerboseLogging = false;
         public MineRegionPermutation(IEnumerable<List<((int x, int y) pos, bool mine)>> ValidPermutations, bool verboseLogging = false)
         {

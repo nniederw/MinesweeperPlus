@@ -14,10 +14,11 @@
         private sbyte[,] NumberField; //0-8 numbers, 9 meaning mine
         private uint NonMinesLeft;
         private bool[,] ClickedSquares;
+        private List<(int x, int y)> StartClears = new List<(int x, int y)>();
         /// <summary>
-        /// Note: mineField gets shallow copied.
+        /// Note: mineField gets copied.
         /// </summary>
-        public Board(bool[,] mineField)
+        public Board(bool[,] mineField, List<(int x, int y)> startClears = null)
         {
             SizeX = Convert.ToUInt32(mineField.GetLength(0));
             SizeY = Convert.ToUInt32(mineField.GetLength(1));
@@ -25,9 +26,14 @@
             Mines = CalcMines();
             NumberField = new sbyte[SizeX, SizeY];
             CalcNumbers();
-            NonMinesLeft = SizeX * SizeY - Mines;
             ClickedSquares = new bool[SizeX, SizeY];
+            if (startClears != null)
+            {
+                StartClears = startClears;
+            }
+            ResetBoard();
         }
+        public sbyte ClickOnSquare((int x, int y) pos) => ClickOnSquare(pos.x, pos.y);
         public sbyte ClickOnSquare(int x, int y)
         {
             if (MineField[x, y]) throw new MineExplosionException($"Clicked on a mine on ({x}, {y})");
@@ -48,6 +54,11 @@
                     ClickedSquares[x, y] = false;
                 }
             }
+            try
+            {
+                StartClears.ForEach(pos => ClickOnSquare(pos));
+            }
+            catch (MineExplosionException mee) { throw new Exception($"The {nameof(Board)} had {nameof(StartClears)} with mine position making it explode on board generation."); }
         }
         public bool IsCleared() => NonMinesLeft == 0;
         public List<(int x, int y)> GetNeighbors((int x, int y) pos) => GetNeighbors(pos.x, pos.y);
@@ -74,6 +85,7 @@
                 }
             }
         }
+        public IEnumerable<(int x, int y)> GetStartClears() => StartClears;
         public sbyte[,] CheatGetNumbers() => NumberField;
         private uint CalcMines()
         {

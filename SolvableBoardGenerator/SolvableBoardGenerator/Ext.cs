@@ -104,6 +104,23 @@ public static class Ext
         }
         return res;
     }
+    public static IEnumerable<K> KeyIntersection<K, V>(this IReadOnlyDictionary<K, V> dict1, IReadOnlyDictionary<K, V> dict2)
+    {
+        if (dict1.Count > dict2.Count)
+        {
+            var tmp = dict1;
+            dict1 = dict2;
+            dict2 = tmp;
+        }
+        //dict1 < dict2
+        foreach (var k in dict1.Keys)
+        {
+            if (dict2.ContainsKey(k))
+            {
+                yield return k;
+            }
+        }
+    }
     public static IEnumerable<(A, B)> CartesianProduct<A, B>(this IEnumerable<A> aElements, IEnumerable<B> bElements) => aElements.SelectMany(a => bElements, (a, b) => (a, b));
     public static void ConsoleWriteColor(string msg, ConsoleColor? backColor = null, ConsoleColor? forColor = null)
     {

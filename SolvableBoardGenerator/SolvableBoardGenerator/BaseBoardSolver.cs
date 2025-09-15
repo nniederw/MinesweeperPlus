@@ -45,6 +45,11 @@ namespace Minesweeper
             VerboseLogging = verboseLogging;
         }
         public void DisableAutoLoggingDuringPhases() => VerboseLoggingDuringPhasesForceDisable = true;
+        public void ChangeBoard(Board board)
+        {
+            Board = board;
+            ResetSolver();
+        }
         public abstract IBoardSolver Construct(Board board, bool verboseLogging = false);
         public virtual SolvabilityClass GetSolvabilityClass => SolvabilityClass.Unknown;
         private static void TestConstruct<T>(Board board) where T : BaseBoardSolver
@@ -135,6 +140,10 @@ namespace Minesweeper
                     DiscoveredNumbers[x, y] = UndiscoveredNumber;
                 }
             }
+            foreach (var pos in Board.GetStartClears())
+            {
+                ClickSquare(pos);
+            }
         }
         /// <summary>
         /// Tests Square for 1 sized pattern, returns true if it was a 1 sized pattern.
@@ -177,7 +186,7 @@ namespace Minesweeper
         protected void SetMine((int x, int y) pos) => SetMine(pos.x, pos.y);
         protected void ClickSquare(int x, int y)
         {
-            if (DiscoveredNumbers[x,y] != UndiscoveredNumber)
+            if (DiscoveredNumbers[x, y] != UndiscoveredNumber)
             {
                 return;
             }

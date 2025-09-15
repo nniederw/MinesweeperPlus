@@ -33,10 +33,10 @@
          */
         /* Info for solvable BoardType(100, 100, 2100) boards: 
          * [seed, solvable from (x,y)]
-         *  121, (0,0)
-         *  3828, (0,3)
-         *  7865, (0,0)
-         *  9415, (0,0)
+         *  121,   (0,0)
+         *  3828,  (0,3)
+         *  7865,  (0,0)
+         *  9415,  (0,0)
          *  14399, (0,2)
          *  15548, (0,0)
          *  16629, (0,3)
@@ -45,6 +45,11 @@
          *  35750, (0,0)
          *  38850, (0,5)
          *  42540, (0,3)
+         *  54338, (0,0)
+         *  56017, (0,0)
+         *  58892, (0,8)
+         *  68689, (0,0)
+         *  70812, (0,0)
          */
         public static Board GetRandomSeededBoard(BoardType boardType, int? seed = null) => new Board(GetRandomSeededField(boardType, seed));
         public static bool[,] GetRandomSeededField(BoardType boardType, int? seed = null) => GetRandomSeededBoard(boardType.Width, boardType.Height, boardType.Mines, seed);

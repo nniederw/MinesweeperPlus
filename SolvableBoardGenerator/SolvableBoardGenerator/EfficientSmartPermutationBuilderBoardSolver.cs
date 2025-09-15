@@ -1,11 +1,11 @@
 ﻿namespace Minesweeper
 {
-    public class SmartPermutationBuilderBoardSolver : BaseBoardSolver
+    public class EfficientSmartPermutationBuilderBoardSolver : BaseBoardSolver
     {
         private uint BreakEarlyLogicChain = uint.MaxValue;
         private uint MaxMergablePermutationCount = uint.MaxValue;
-        public SmartPermutationBuilderBoardSolver(Board board, bool verboseLogging = false) : base(board, verboseLogging) { }
-        public override IBoardSolver Construct(Board board, bool verboseLogging = false) => new SmartPermutationBuilderBoardSolver(board, verboseLogging);
+        public EfficientSmartPermutationBuilderBoardSolver(Board board, bool verboseLogging = false) : base(board, verboseLogging) { }
+        public override IBoardSolver Construct(Board board, bool verboseLogging = false) => new EfficientSmartPermutationBuilderBoardSolver(board, verboseLogging);
         public void SetBreakEarlyLogicChain(uint value)
         {
             BreakEarlyLogicChain = value;
@@ -100,28 +100,24 @@
             }
             return false;
         }
-        private MineRegionPermutation MineRegionPermutationFromNumber((int x, int y) pos)
+        private EfficientMineRegionPermutation MineRegionPermutationFromNumber((int x, int y) pos)
         {
             if (DiscoveredNumbers[pos.x, pos.y] == UndiscoveredNumber)
             {
-                throw new Exception($"Called {nameof(MineRegionPermutationFromNumber)} in {nameof(SmartPermutationBuilderBoardSolver)} with a unopened square, which isn't allowed.");
+                throw new Exception($"Called {nameof(MineRegionPermutationFromNumber)} in {nameof(EfficientSmartPermutationBuilderBoardSolver)} with a unopened square, which isn't allowed.");
             }
             var totalNeighbors = Board.GetNeighbors(pos).ToList();
             uint mines = (uint)DiscoveredNumbers[pos.x, pos.y] - (uint)totalNeighbors.Count(i => IsSetMine(i));
             var neighbors = totalNeighbors.Where(i => !IsSetMine(i) && !IsOpenedSquare(i)).ToList();
-            uint neighborsCount = (uint)neighbors.Count;
-            var boolPermuts = Combinatorics.GetCombinationsIterative(mines, neighborsCount);
-            var permuts = boolPermuts.Select(i => neighbors.Zip(i).ToList());
-            return new MineRegionPermutation(permuts, VerboseLogging);
-
+            return new EfficientMineRegionPermutation(mines, neighbors, VerboseLogging);
         }
         private class MineRegionPermutationNode
         {
             public List<MineRegionPermutationNode> ConnectedNodes = new List<MineRegionPermutationNode>();
-            public MineRegionPermutation MineRegionPermutation;
+            public EfficientMineRegionPermutation MineRegionPermutation;
             public MineRegionPermutationNode PointerToItself; //set this to the new node, when merging two nodes, such that references to this node can resolve the new merged node.
             public uint NumbersCombined => (uint)MineRegionPermutation.Squares.Count();
-            public MineRegionPermutationNode(MineRegionPermutation mineRegionPermutation)
+            public MineRegionPermutationNode(EfficientMineRegionPermutation mineRegionPermutation)
             {
                 MineRegionPermutation = mineRegionPermutation;
                 PointerToItself = this;
