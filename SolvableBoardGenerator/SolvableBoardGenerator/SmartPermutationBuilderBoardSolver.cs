@@ -25,8 +25,6 @@
             {
                 return false;
             }
-            var unusedNumbers = ActiveNumbers.ToHashSet();
-            var usedNumbers = new HashSet<(int x, int y)>();
             var regions = new List<MineRegionPermutationNode>(); //todo maybe figure out a better datastructure, but elements should remain very few regardless.
             {
                 var regionsDict = new Dictionary<(int x, int y), MineRegionPermutationNode>();

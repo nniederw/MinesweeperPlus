@@ -201,6 +201,20 @@ namespace Minesweeper
         protected bool IsSetMine(int x, int y) => DiscoveredMines[x, y];
         protected bool IsSetMine((int x, int y) pos) => IsSetMine(pos.x, pos.y);
         /// <summary>
+        /// Intended for opened squares only.
+        /// Connectivity returned is how many squares are shared between the two numbers.
+        /// </summary>
+        protected IEnumerable<((int x, int y) pos, uint connectivity)> ConnectedNumbersWithConnectivity((int x, int y) pos)
+        {
+            var neighbors = Board.GetNeighbors(pos).Where(i => !IsOpenedSquare(i)).ToList();
+            var neighborsOfNeighbors = neighbors.SelectMany(i => Board.GetNeighbors(pos)).Where(i => IsOpenedSquare(i));
+            foreach (var number in neighborsOfNeighbors)
+            {
+                if (number == pos) { continue; }
+                yield return (number, (uint)Board.GetNeighbors(number).Where(i => !IsOpenedSquare(i)).Intersect(neighbors).Count());
+            }
+        }
+        /// <summary>
         /// If called with an unopened Squares returns all opened numbers connected to that square,
         /// otherwise (called with an opened number) returns all numbers that have at least one unopened square, thats not marked as a mine, shared between them. 
         /// </summary>
