@@ -4,6 +4,7 @@
     {
         private uint BreakEarlyLogicChain = uint.MaxValue;
         private uint MaxMergablePermutationCount = uint.MaxValue;
+        public SmarterPermutationBuilderBoardSolver() : base() { }
         public SmarterPermutationBuilderBoardSolver(Board board, bool verboseLogging = false) : base(board, verboseLogging) { }
         public override IBoardSolver Construct(Board board, bool verboseLogging = false) => new SmarterPermutationBuilderBoardSolver(board, verboseLogging);
         public void SetBreakEarlyLogicChain(uint value)
@@ -21,30 +22,83 @@
         }
         private bool PermutationBuildingAlgorithm()
         {
+            var time = DateTime.Now;
             if (!ActiveNumbers.Any())
             {
                 return false;
             }
-            //var regions = new List<MineRegionPermutationNode>(); //todo maybe figure out a better datastructure, but elements should remain very few regardless.
-            var regions = new List<LogicGraphNode>();
+            /*
+            var logicRegion = new List<LogicGraphNode>();
+            var regionsDict = new Dictionary<(int x, int y), LogicGraphNode>();
+            foreach (var pos in ActiveNumbers)
             {
-                var regionsDict = new Dictionary<(int x, int y), LogicGraphNode>();
+                var reg = new LogicGraphNode(pos);
+                regionsDict[pos] = reg;
+                logicRegion.Add(reg);
+            }
+            foreach (var reg in regionsDict)
+            {
+                var connectedNumbers = ConnectedNumbersWithConnectivity(reg.Key);
+                foreach (var edge in connectedNumbers.Where(i => ActiveNumbers.Contains(i.pos)))
+                {
+                    reg.Value.ConnectedNodes.Add((edge.connectivity, regionsDict[edge.pos]));
+                }
+            }
+            bool mergedSth = true;
+            while (mergedSth)
+            {
+                mergedSth = false;
+                for (int i = logicRegion.Count - 1; i >= 0; i--)
+                {
+                    var reg = logicRegion[i];
+                    var reg2 = reg.ConnectedNodes.Find(i => i.connectivity > 1).node;
+                    if (reg2 == null) { continue; }
+                    mergedSth = true;
+                    logicRegion.RemoveAt(i);
+                    logicRegion.Remove(reg2);
+                    logicRegion.Add(LogicGraphNode.Merge(reg, reg2));
+                    break;
+                }
+            }
+            Console.WriteLine($"Time: {(DateTime.Now - time).TotalMilliseconds}ms");
+            var regions = new List<MineRegionPermutationNode>();
+            {
+                var regDict = new Dictionary<(int x, int y), MineRegionPermutationNode>();
+                foreach (var lReg in logicRegion)
+                {
+                    foreach (var number in lReg.Numbers)
+                    {
+                        var mrpn = new MineRegionPermutationNode(MineRegionPermutationFromNumber(number));
+                        regions.Add(mrpn);
+                        regDict.Add(number, mrpn);
+                    }
+                    foreach (var pos in regDict.Keys)
+                    {
+                        foreach (var pos2 in ConnectedNumbers(pos).Where(i => regDict.ContainsKey(i)))
+                        {
+                            regDict[pos].ConnectedNodes.Add(regDict[pos2]);
+                        }
+                    }
+                }
+            }*/
+            var regions = new List<MineRegionPermutationNode>();
+            {
+                var regionsDict = new Dictionary<(int x, int y), MineRegionPermutationNode>();
                 foreach (var pos in ActiveNumbers)
                 {
-                    var reg = new LogicGraphNode(pos);
+                    var reg = new MineRegionPermutationNode(MineRegionPermutationFromNumber(pos));
                     regionsDict[pos] = reg;
                     regions.Add(reg);
                 }
                 foreach (var reg in regionsDict)
                 {
-                    var connectedNumbers = ConnectedNumbersWithConnectivity(reg.Key);
-                    foreach (var edge in connectedNumbers.Where(i => ActiveNumbers.Contains(i.pos)))
+                    var connectedNumbers = ConnectedNumbersWithConnectivity(reg.Key).Where(i => i.connectivity > 1).Select(i => i.pos);
+                    foreach (var edge in connectedNumbers.Where(i => ActiveNumbers.Contains(i)))
                     {
-                        reg.Value.ConnectedNodes.Add((edge.connectivity, regionsDict[edge.pos]));
+                        reg.Value.ConnectedNodes.Add(regionsDict[edge]);
                     }
                 }
             }
-
             uint minRegionNumberCount = 1;
             while (minRegionNumberCount < BreakEarlyLogicChain && regions.Where(i => i.ConnectedNodes.Any()).Where(i => i.MineRegionPermutation.PermutationCount < MaxMergablePermutationCount).Where(i => i.ConnectedNodes.Any(j => j.MineRegionPermutation.PermutationCount < MaxMergablePermutationCount)).Any())
             {
@@ -130,23 +184,29 @@
         private class LogicGraphNode
         {
             public List<(int x, int y)> Numbers = new List<(int x, int y)>();
-            public List<(uint connectivity, LogicGraphNode node)> ConnectedNodes = new List<(int connectivity, LogicGraphNode node)>();
+            public HashSet<(uint connectivity, LogicGraphNode node)> ConnectedNodes = new HashSet<(uint connectivity, LogicGraphNode node)>();
             public LogicGraphNode PointerToItself; //set this to the new node, when merging two nodes, such that references to this node can resolve the new merged node.
-            public LogicGraphNode() { }
+            public LogicGraphNode() { PointerToItself = this; }
             public LogicGraphNode((int x, int y) pos)
             {
                 Numbers.Add(pos);
+                PointerToItself = this;
             }
             public void CheckConnectedNodesForUpdates()
             {
-                ConnectedNodes = ConnectedNodes.Select(i => (i.connectivity, i.node.PointerToItself)).ToList();
+                ConnectedNodes = ConnectedNodes.Select(i => (i.connectivity, i.node.PointerToItself)).ToHashSet();
             }
             public static LogicGraphNode Merge(LogicGraphNode n1, LogicGraphNode n2)
             {
                 var result = new LogicGraphNode();
+                result.Numbers = n1.Numbers.Union(n2.Numbers).ToList();
+                result.ConnectedNodes = n1.ConnectedNodes.Union(n2.ConnectedNodes).Where(i => i.node != n1 && i.node != n2).ToHashSet();
+                //todo combine edges with connectivity c1 & c2 of same other node => c1 + c2
                 n1.PointerToItself = result;
                 n2.PointerToItself = result;
-
+                n1.ConnectedNodes.Foreach(i => i.node.CheckConnectedNodesForUpdates());
+                n2.ConnectedNodes.Foreach(i => i.node.CheckConnectedNodesForUpdates());
+                return result;
             }
         }
     }

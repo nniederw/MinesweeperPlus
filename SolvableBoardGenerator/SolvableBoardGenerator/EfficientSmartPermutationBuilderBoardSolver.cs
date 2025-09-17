@@ -4,6 +4,7 @@
     {
         private uint BreakEarlyLogicChain = uint.MaxValue;
         private uint MaxMergablePermutationCount = uint.MaxValue;
+        public EfficientSmartPermutationBuilderBoardSolver() : base() { }
         public EfficientSmartPermutationBuilderBoardSolver(Board board, bool verboseLogging = false) : base(board, verboseLogging) { }
         public override IBoardSolver Construct(Board board, bool verboseLogging = false) => new EfficientSmartPermutationBuilderBoardSolver(board, verboseLogging);
         public void SetBreakEarlyLogicChain(uint value)

@@ -24,13 +24,25 @@ namespace Minesweeper
         protected bool VerboseLoggingDuringPhasesForceDisable = false;
         public uint SquaresCleared { get; private set; }
         public double PercentageCleared => ((double)SquaresCleared) / Board.SizeX / Board.SizeY * 100.0;
-        public BaseBoardSolver() { SquaresCleared = 0; }
+        public BaseBoardSolver()
+        {
+            SquaresCleared = 0;
+            Board = Board.GetEmptyBoard();
+            DiscoveredMines = new bool[0, 0];
+            DiscoveredNumbers = new sbyte[0, 0];
+        }
         public BaseBoardSolver(Board board, bool verboseLogging = false)
         {
             if (board == null)
             {
                 throw new ArgumentNullException($"{nameof(board)} was null in the constructor of {nameof(BaseBoardSolver)}, please call it with a non null {typeof(Board)}");
             }
+            ChangeBoard(board);
+            VerboseLogging = verboseLogging;
+        }
+        public void DisableAutoLoggingDuringPhases() => VerboseLoggingDuringPhasesForceDisable = true;
+        public void ChangeBoard(Board board)
+        {
             Board = board;
             MineCount = board.Mines;
             DiscoveredMines = new bool[board.SizeX, board.SizeY];
@@ -42,12 +54,6 @@ namespace Minesweeper
                     DiscoveredNumbers[x, y] = UndiscoveredNumber;
                 }
             }
-            VerboseLogging = verboseLogging;
-        }
-        public void DisableAutoLoggingDuringPhases() => VerboseLoggingDuringPhasesForceDisable = true;
-        public void ChangeBoard(Board board)
-        {
-            Board = board;
             ResetSolver();
         }
         public abstract IBoardSolver Construct(Board board, bool verboseLogging = false);
@@ -72,6 +78,7 @@ namespace Minesweeper
             var generic = method.MakeGenericMethod(myType);
             generic.Invoke(null, new object[] { board });
         }
+        public virtual bool IsSolvable((int x, int y) startPos) => IsSolvable(startPos.x, startPos.y);
         public virtual bool IsSolvable(int startX, int startY)
         {
             RunDynamicTestConstruct(Board);
@@ -200,18 +207,24 @@ namespace Minesweeper
         protected bool IsOpenedSquare((int x, int y) pos) => IsOpenedSquare(pos.x, pos.y);
         protected bool IsSetMine(int x, int y) => DiscoveredMines[x, y];
         protected bool IsSetMine((int x, int y) pos) => IsSetMine(pos.x, pos.y);
+        protected IEnumerable<(int x, int y)> GetUnopenedNeighbors((int x, int y) pos)
+            => Board.GetNeighbors(pos).Where(i => !IsOpenedSquare(i));
+        protected IEnumerable<(int x, int y)> GetOpenedNeighbors((int x, int y) pos)
+            => Board.GetNeighbors(pos).Where(i => IsOpenedSquare(i));
+        protected IEnumerable<(int x, int y)> GetConnectedUnopenSquares((int x, int y) pos1, (int x, int y) pos2)
+            => GetUnopenedNeighbors(pos1).Intersect(GetUnopenedNeighbors(pos2));
         /// <summary>
         /// Intended for opened squares only.
         /// Connectivity returned is how many squares are shared between the two numbers.
         /// </summary>
         protected IEnumerable<((int x, int y) pos, uint connectivity)> ConnectedNumbersWithConnectivity((int x, int y) pos)
         {
-            var neighbors = Board.GetNeighbors(pos).Where(i => !IsOpenedSquare(i)).ToList();
-            var neighborsOfNeighbors = neighbors.SelectMany(i => Board.GetNeighbors(pos)).Where(i => IsOpenedSquare(i));
+            var neighbors = GetUnopenedNeighbors(pos).ToList();
+            var neighborsOfNeighbors = neighbors.SelectMany(i => GetOpenedNeighbors(i)).Distinct().ToList();
             foreach (var number in neighborsOfNeighbors)
             {
                 if (number == pos) { continue; }
-                yield return (number, (uint)Board.GetNeighbors(number).Where(i => !IsOpenedSquare(i)).Intersect(neighbors).Count());
+                yield return (number, (uint)GetConnectedUnopenSquares(number, pos).Count());
             }
         }
         /// <summary>

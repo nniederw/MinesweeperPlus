@@ -87,6 +87,8 @@
         }
         public IEnumerable<(int x, int y)> GetStartClears() => StartClears;
         public sbyte[,] CheatGetNumbers() => NumberField;
+        public bool IsEmpty => SizeX == 0 && SizeY == 0;
+        public static Board GetEmptyBoard() => new Board(new bool[0, 0]);
         private uint CalcMines()
         {
             uint mines = 0;

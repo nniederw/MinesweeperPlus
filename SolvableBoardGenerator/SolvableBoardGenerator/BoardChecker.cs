@@ -113,6 +113,25 @@
             }
             return !different;
         }
+        public static void SolverComparer<Solver1, Solver2>(Board b, (int x, int y) startPos) where Solver1 : IBoardSolver, new() where Solver2 : IBoardSolver, new()
+        {
+            Solver1 solver1 = new Solver1();
+            solver1.ChangeBoard(b);
+            Solver2 solver2 = new Solver2();
+            solver2.ChangeBoard(b);
+            var time = DateTime.Now;
+            bool solvability1 = solver1.IsSolvable(startPos);
+            var timeSolver1 = DateTime.Now - time;
+            time = DateTime.Now;
+            bool solvability2 = solver2.IsSolvable(startPos);
+            var timeSolver2 = DateTime.Now - time;
+            Console.WriteLine($"{typeof(Solver1).Name}: {timeSolver1.TotalMilliseconds}ms, {typeof(Solver2).Name}: {timeSolver2.TotalMilliseconds}ms = {((double)timeSolver2.Ticks) / timeSolver1.Ticks * 100.0:F1}% of other solver.");
+            if (solvability1 != solvability2)
+            {
+                Ext.ConsoleWriteColor($"{typeof(Solver1).Name} has solvability {solvability1}, but {typeof(Solver2).Name} has solvability {solvability2}", ConsoleColor.Red);
+                Console.WriteLine();
+            }
+        }
         public static void SolverTester<TestSolver, CompleteSolver>(bool printBoards = false) where TestSolver : BaseBoardSolver, new() where CompleteSolver : BaseBoardSolver, new()
         {
             bool foundDifference = false;
