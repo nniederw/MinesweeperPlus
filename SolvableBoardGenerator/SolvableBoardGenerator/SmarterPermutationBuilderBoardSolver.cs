@@ -27,6 +27,29 @@
             {
                 return false;
             }
+            //var regionsDict = new Dictionary<(int x, int y), LogicGraphNode>();
+            Dictionary<(int x, int y), List<((int x, int y) pos, uint connectivity)>> Edges = new Dictionary<(int x, int y), List<((int x, int y) pos, uint connectivity)>>();
+            foreach (var pos in ActiveNumbers)
+            {
+                var edges = ConnectedNumbersWithConnectivity(pos);
+                Edges[pos] = new List<((int x, int y) pos, uint connectivity)>();
+                foreach (var edge in edges)
+                {
+                    Edges[pos].Add(edge);
+                }
+            }
+            var numbersVisited = new HashSet<(int x, int y)>();
+            var numbersInLogic = new List<(int x, int y)>();
+            var startNumber = ActiveNumbers.First();
+            var front = new List<(int x, int y)> { startNumber };
+            var number = front.Last();
+            front.RemoveAt(front.Count - 1);
+            numbersVisited.Add(number);
+//            Edges[number].ForEach(i=>i.connectivity > 1 && )
+            //BFS or DFS
+            //todo
+
+
             /*
             var logicRegion = new List<LogicGraphNode>();
             var regionsDict = new Dictionary<(int x, int y), LogicGraphNode>();
@@ -183,7 +206,7 @@
         }
         private class LogicGraphNode
         {
-            public List<(int x, int y)> Numbers = new List<(int x, int y)>();
+            public HashSet<(int x, int y)> Numbers = new HashSet<(int x, int y)>();
             public HashSet<(uint connectivity, LogicGraphNode node)> ConnectedNodes = new HashSet<(uint connectivity, LogicGraphNode node)>();
             public LogicGraphNode PointerToItself; //set this to the new node, when merging two nodes, such that references to this node can resolve the new merged node.
             public LogicGraphNode() { PointerToItself = this; }
@@ -199,7 +222,7 @@
             public static LogicGraphNode Merge(LogicGraphNode n1, LogicGraphNode n2)
             {
                 var result = new LogicGraphNode();
-                result.Numbers = n1.Numbers.Union(n2.Numbers).ToList();
+                result.Numbers = n1.Numbers.Union(n2.Numbers).ToHashSet();
                 result.ConnectedNodes = n1.ConnectedNodes.Union(n2.ConnectedNodes).Where(i => i.node != n1 && i.node != n2).ToHashSet();
                 //todo combine edges with connectivity c1 & c2 of same other node => c1 + c2
                 n1.PointerToItself = result;

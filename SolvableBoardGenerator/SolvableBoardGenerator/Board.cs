@@ -61,19 +61,31 @@
             catch (MineExplosionException mee) { throw new Exception($"The {nameof(Board)} had {nameof(StartClears)} with mine position making it explode on board generation."); }
         }
         public bool IsCleared() => NonMinesLeft == 0;
-        public List<(int x, int y)> GetNeighbors((int x, int y) pos) => GetNeighbors(pos.x, pos.y);
-        public List<(int x, int y)> GetNeighbors(int x, int y)
+        public IEnumerable<(int x, int y)> GetNeighbors((int x, int y) pos) => GetNeighbors(pos.x, pos.y);
+        public IEnumerable<(int x, int y)> GetNeighbors(int x, int y)
         {
-            List<(int x, int y)> result = new();
-            if (InBoardBound(x - 1, y + 1)) { result.Add((x - 1, y + 1)); }
-            if (InBoardBound(x + 0, y + 1)) { result.Add((x + 0, y + 1)); }
-            if (InBoardBound(x + 1, y + 1)) { result.Add((x + 1, y + 1)); }
-            if (InBoardBound(x + 1, y + 0)) { result.Add((x + 1, y + 0)); }
-            if (InBoardBound(x + 1, y - 1)) { result.Add((x + 1, y - 1)); }
-            if (InBoardBound(x + 0, y - 1)) { result.Add((x + 0, y - 1)); }
-            if (InBoardBound(x - 1, y + 0)) { result.Add((x - 1, y + 0)); }
-            if (InBoardBound(x - 1, y - 1)) { result.Add((x - 1, y - 1)); }
-            return result;
+            if (0 < x && x < SizeX - 1 && 0 < y && y < SizeY - 1)
+            {
+                yield return (x - 1, y + 1);
+                yield return (x + 0, y + 1);
+                yield return (x + 1, y + 1);
+                yield return (x + 1, y + 0);
+                yield return (x + 1, y - 1);
+                yield return (x + 0, y - 1);
+                yield return (x - 1, y + 0);
+                yield return (x - 1, y - 1);
+            }
+            else
+            {
+                if (InBoardBound(x - 1, y + 1)) { yield return (x - 1, y + 1); }
+                if (InBoardBound(x + 0, y + 1)) { yield return (x + 0, y + 1); }
+                if (InBoardBound(x + 1, y + 1)) { yield return (x + 1, y + 1); }
+                if (InBoardBound(x + 1, y + 0)) { yield return (x + 1, y + 0); }
+                if (InBoardBound(x + 1, y - 1)) { yield return (x + 1, y - 1); }
+                if (InBoardBound(x + 0, y - 1)) { yield return (x + 0, y - 1); }
+                if (InBoardBound(x - 1, y + 0)) { yield return (x - 1, y + 0); }
+                if (InBoardBound(x - 1, y - 1)) { yield return (x - 1, y - 1); }
+            }
         }
         public IEnumerable<(int x, int y)> AllSquares()
         {
@@ -122,8 +134,6 @@
             }
         }
         private bool InBoardBound(int x, int y)
-        {
-            return (0 <= x && x < SizeX) && (0 <= y && y < SizeY);
-        }
+            => 0 <= x && x < SizeX && (0 <= y && y < SizeY);
     }
 }

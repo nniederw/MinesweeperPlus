@@ -92,7 +92,7 @@ namespace Minesweeper
                 return false;
             }
             ActiveNumbers.Add((startX, startY));
-            Board.GetNeighbors(startX, startY).ForEach(i => ActiveUnopenedSquares.Add(i));
+            Board.GetNeighbors(startX, startY).Foreach(i => ActiveUnopenedSquares.Add(i));
             while (!Board.IsCleared())
             {
                 bool progress = false;
@@ -220,11 +220,11 @@ namespace Minesweeper
         protected IEnumerable<((int x, int y) pos, uint connectivity)> ConnectedNumbersWithConnectivity((int x, int y) pos)
         {
             var neighbors = GetUnopenedNeighbors(pos).ToList();
-            var neighborsOfNeighbors = neighbors.SelectMany(i => GetOpenedNeighbors(i)).Distinct().ToList();
-            foreach (var number in neighborsOfNeighbors)
+            var neighborsOfNeighbors = neighbors.SelectMany(i => GetOpenedNeighbors(i)).GroupBy(i => (i.x, i.y));
+            foreach (var group in neighborsOfNeighbors)
             {
-                if (number == pos) { continue; }
-                yield return (number, (uint)GetConnectedUnopenSquares(number, pos).Count());
+                if (group.Key == pos) { continue; }
+                yield return (group.Key, (uint)group.Count());
             }
         }
         /// <summary>
