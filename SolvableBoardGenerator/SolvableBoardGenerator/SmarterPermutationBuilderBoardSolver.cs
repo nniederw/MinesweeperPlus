@@ -38,46 +38,86 @@
                     Edges[pos].Add(edge);
                 }
             }
-            var numbersNotVisited = ActiveNumbers.ToHashSet();
-            var numbersVisited = new HashSet<(int x, int y)>();
-            var weakEdgesOut = new HashSet<(int x, int y)>();
-            var numbersInLogic = new List<(int x, int y)>();
-            var startNumber = ActiveNumbers.First();
-            var front = new HashSet<(int x, int y)> { startNumber };
-            while (front.Any())
+            var logicGraphNodeLookup = new Dictionary<(int x, int y), LogicGraphNode>();
+            var numbersNotVisited = ActiveNumbers.Select(i => new LogicGraphNode(i)).ToHashSet();
+            foreach (var lgn in numbersNotVisited)
             {
-                (int x, int y) number = front.First();
-                numbersInLogic.Add(number);
-                numbersVisited.Add(number);
-                numbersNotVisited.Remove(number);
-                Edges[number].ForEach(
-                    i =>
-                    {
-                        if (!numbersVisited.Contains(i.pos))
-                        {
-                            if (i.connectivity > 1)
-                            {
-                                front.Add(i.pos);
-                            }
-                            else
-                            {
-                                if (weakEdgesOut.Contains(i.pos))
-                                {
-                                    weakEdgesOut.Remove(i.pos);
-                                    front.Add(i.pos);
-                                }
-                                else
-                                {
-                                    weakEdgesOut.Add(i.pos);
-                                }
-                            }
-                        }
-                    });
-                if (weakEdgesOut.Contains(number))
+                logicGraphNodeLookup.Add(lgn.Numbers.First(), lgn);
+            }
+            foreach (var i in numbersNotVisited)
+            {
+                if (Edges.ContainsKey(i.Numbers.First()))
                 {
-                    weakEdgesOut.Remove(number);
+                    foreach (var edge in Edges[i.Numbers.First()])
+                    {
+                        i.ConnectedNodes.Add((edge.connectivity, logicGraphNodeLookup[edge.pos]));
+                    }
                 }
             }
+            bool mergedSomething = true;
+            while (mergedSomething)
+            {
+                mergedSomething = false;
+                var numbersVisited = new HashSet<LogicGraphNode>();
+                var weakEdgesOut = new HashSet<LogicGraphNode>();
+
+                var newLogicNodes = new List<LogicGraphNode>();
+                while (numbersNotVisited.Any())
+                {
+                    var startNumber = numbersNotVisited.First();
+                    var front = new HashSet<LogicGraphNode> { startNumber };
+                    var numbersInLogic = new List<(int x, int y)>();
+                    var nodesInLogic = new List<LogicGraphNode>();
+                    while (front.Any())
+                    {
+                        var number = front.First();
+                        number.Numbers.ForEach(i => numbersInLogic.Add(i));
+                        nodesInLogic.Add(number);
+                        numbersVisited.Add(number);
+                        numbersNotVisited.Remove(number);
+                        number.ConnectedNodes.ForEach(
+                            i =>
+                            {
+                                if (!numbersVisited.Contains(i.node))
+                                {
+                                    if (i.connectivity > 1)
+                                    {
+                                        front.Add(i.node);
+                                    }
+                                    else
+                                    {
+                                        if (weakEdgesOut.Contains(i.node))
+                                        {
+                                            weakEdgesOut.Remove(i.node);
+                                            front.Add(i.node);
+                                        }
+                                        else
+                                        {
+                                            weakEdgesOut.Add(i.node);
+                                        }
+                                    }
+                                }
+                            });
+                        if (weakEdgesOut.Contains(number))
+                        {
+                            weakEdgesOut.Remove(number);
+                        }
+                    }
+                    if (nodesInLogic.Count > 1)
+                    {
+                        mergedSomething = true;
+                        var newNode = new LogicGraphNode();
+                        newNode.Numbers = numbersInLogic;
+                        nodesInLogic.ForEach(i => i.PointerToItself = newNode);
+                        newNode.ConnectedNodes = weakEdgesOut.Select(i => ((uint)1, i)).ToList();
+                        newLogicNodes.Add(newNode);
+                    }
+                }
+                numbersNotVisited = newLogicNodes.Select(i => i.PointerToItself).ToHashSet();
+                numbersNotVisited.Foreach(i => i.CheckConnectedNodesForUpdates());
+            }
+            var regionsToExplore = numbersNotVisited.ToList();
+
             // use numbersInLogic + WeakEdgesOut as logic graph node
 
 
@@ -243,8 +283,8 @@
         }
         private class LogicGraphNode
         {
-            public HashSet<(int x, int y)> Numbers = new HashSet<(int x, int y)>();
-            public HashSet<(uint connectivity, LogicGraphNode node)> ConnectedNodes = new HashSet<(uint connectivity, LogicGraphNode node)>();
+            public List<(int x, int y)> Numbers = new List<(int x, int y)>();
+            public List<(uint connectivity, LogicGraphNode node)> ConnectedNodes = new List<(uint connectivity, LogicGraphNode node)>();
             public LogicGraphNode PointerToItself; //set this to the new node, when merging two nodes, such that references to this node can resolve the new merged node.
             public LogicGraphNode() { PointerToItself = this; }
             public LogicGraphNode((int x, int y) pos)
@@ -254,13 +294,21 @@
             }
             public void CheckConnectedNodesForUpdates()
             {
-                ConnectedNodes = ConnectedNodes.Select(i => (i.connectivity, i.node.PointerToItself)).ToHashSet();
+                for (int i = 0; i < ConnectedNodes.Count; i++)
+                {
+                    var node = ConnectedNodes[i];
+                    var pti = node.node.PointerToItself;
+                    if (pti != node.node)
+                    {
+                        ConnectedNodes[i] = (node.connectivity, pti);
+                    }
+                }
             }
             public static LogicGraphNode Merge(LogicGraphNode n1, LogicGraphNode n2)
             {
                 var result = new LogicGraphNode();
-                result.Numbers = n1.Numbers.Union(n2.Numbers).ToHashSet();
-                result.ConnectedNodes = n1.ConnectedNodes.Union(n2.ConnectedNodes).Where(i => i.node != n1 && i.node != n2).ToHashSet();
+                result.Numbers = n1.Numbers.Union(n2.Numbers).ToList();
+                result.ConnectedNodes = n1.ConnectedNodes.Union(n2.ConnectedNodes).Where(i => i.node != n1 && i.node != n2).ToList();
                 //todo combine edges with connectivity c1 & c2 of same other node => c1 + c2
                 n1.PointerToItself = result;
                 n2.PointerToItself = result;
