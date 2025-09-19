@@ -38,14 +38,51 @@
                     Edges[pos].Add(edge);
                 }
             }
+            var numbersNotVisited = ActiveNumbers.ToHashSet();
             var numbersVisited = new HashSet<(int x, int y)>();
+            var weakEdgesOut = new HashSet<(int x, int y)>();
             var numbersInLogic = new List<(int x, int y)>();
             var startNumber = ActiveNumbers.First();
-            var front = new List<(int x, int y)> { startNumber };
-            var number = front.Last();
-            front.RemoveAt(front.Count - 1);
-            numbersVisited.Add(number);
-//            Edges[number].ForEach(i=>i.connectivity > 1 && )
+            var front = new HashSet<(int x, int y)> { startNumber };
+            while (front.Any())
+            {
+                (int x, int y) number = front.First();
+                numbersInLogic.Add(number);
+                numbersVisited.Add(number);
+                numbersNotVisited.Remove(number);
+                Edges[number].ForEach(
+                    i =>
+                    {
+                        if (!numbersVisited.Contains(i.pos))
+                        {
+                            if (i.connectivity > 1)
+                            {
+                                front.Add(i.pos);
+                            }
+                            else
+                            {
+                                if (weakEdgesOut.Contains(i.pos))
+                                {
+                                    weakEdgesOut.Remove(i.pos);
+                                    front.Add(i.pos);
+                                }
+                                else
+                                {
+                                    weakEdgesOut.Add(i.pos);
+                                }
+                            }
+                        }
+                    });
+                if (weakEdgesOut.Contains(number))
+                {
+                    weakEdgesOut.Remove(number);
+                }
+            }
+            // use numbersInLogic + WeakEdgesOut as logic graph node
+
+
+
+            //            Edges[number].ForEach(i=>i.connectivity > 1 && )
             //BFS or DFS
             //todo
 
