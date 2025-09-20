@@ -104,13 +104,13 @@ List<((int x, int y) pos, int seed)> SolvableBoards = new List<((int x, int y) p
 ((0,0),68689),
 ((0,0),70812),
 };
-//SolvableBoards.Clear();
+SolvableBoards.Clear();
 foreach (var solvabel in SolvableBoards)
 {
     Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(100, 100, 2100), solvabel.seed);
     int x, y;
     (x, y) = solvabel.pos;
-    BoardChecker.SolverComparer<EfficientSmartPermutationBuilderBoardSolver, SmarterPermutationBuilderBoardSolver>(b, solvabel.pos);
+    BoardChecker.SolverComparer<EfficientSmartPermutationBuilderBoardSolver, SmarterPermutationBuilderBoardSolver>(b, solvabel.pos, false);
     /*SmartPermutationBuilderBoardSolver pSolver = new SmartPermutationBuilderBoardSolver(b, false);
     var time = DateTime.Now;
     bool solvableFromCurPos = pSolver.IsSolvable(x, y);
@@ -138,6 +138,9 @@ for (int i = 0; i < 224; i++)
     //pSolver.SetMaxMergablePermutationCount(100000);
     pSolver.DisableAutoLoggingDuringPhases();
     var startPos = BoardChecker.FindFirstZero(b);
+    var spbbs = new SmarterPermutationBuilderBoardSolver(b, true);
+    spbbs.DisableAutoLoggingDuringPhases();
+    spbbs.IsSolvable(startPos);
     BoardChecker.SolverComparer<EfficientSmartPermutationBuilderBoardSolver, SmarterPermutationBuilderBoardSolver>(b, startPos);
     /*
     //SmartPermutationBuilderBoardSolver pSolver = new SmartPermutationBuilderBoardSolver(b, false);

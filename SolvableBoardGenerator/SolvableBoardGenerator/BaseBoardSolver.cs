@@ -56,6 +56,10 @@ namespace Minesweeper
             }
             ResetSolver();
         }
+        public void SetVerboseLogging(bool verboseLogging)
+        {
+            VerboseLogging = verboseLogging;
+        }
         public abstract IBoardSolver Construct(Board board, bool verboseLogging = false);
         public virtual SolvabilityClass GetSolvabilityClass => SolvabilityClass.Unknown;
         private static void TestConstruct<T>(Board board) where T : BaseBoardSolver

@@ -113,11 +113,13 @@
             }
             return !different;
         }
-        public static void SolverComparer<Solver1, Solver2>(Board b, (int x, int y) startPos) where Solver1 : IBoardSolver, new() where Solver2 : IBoardSolver, new()
+        public static void SolverComparer<Solver1, Solver2>(Board b, (int x, int y) startPos, bool verboseLogging = false) where Solver1 : IBoardSolver, new() where Solver2 : IBoardSolver, new()
         {
             Solver1 solver1 = new Solver1();
+            solver1.SetVerboseLogging(verboseLogging);
             solver1.ChangeBoard(b);
             Solver2 solver2 = new Solver2();
+            solver2.SetVerboseLogging(verboseLogging);
             solver2.ChangeBoard(b);
             var time = DateTime.Now;
             bool solvability1 = solver1.IsSolvable(startPos);
