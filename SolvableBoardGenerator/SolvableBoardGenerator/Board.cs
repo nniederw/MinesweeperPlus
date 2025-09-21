@@ -1,11 +1,6 @@
 ﻿namespace Minesweeper
 {
-    public class MineExplosionException : Exception
-    {
-        public MineExplosionException() : base() { }
-        public MineExplosionException(string s) : base(s) { }
-    }
-    public class Board
+    public class Board : IBoard
     {
         public uint SizeX { private set; get; }
         public uint SizeY { private set; get; }
@@ -15,6 +10,7 @@
         private uint NonMinesLeft;
         private bool[,] ClickedSquares;
         private List<(int x, int y)> StartClears = new List<(int x, int y)>();
+        public const sbyte MineSByte = 9;
         /// <summary>
         /// Note: mineField gets copied.
         /// </summary>
@@ -124,7 +120,7 @@
                 {
                     if (MineField[x, y])
                     {
-                        NumberField[x, y] = 9;
+                        NumberField[x, y] = MineSByte;
                     }
                     else
                     {

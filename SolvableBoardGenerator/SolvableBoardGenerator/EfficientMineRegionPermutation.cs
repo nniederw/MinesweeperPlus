@@ -28,7 +28,7 @@ namespace Minesweeper
             IndexLookupTable = indexLookupTable;
             VerboseLogging = verboseLogging;
         }
-        public IEnumerable<(int x, int y)> Squares => IndexLookupTable.Keys;
+        public IEnumerable<(int x, int y)> Numbers => IndexLookupTable.Keys;
         public IEnumerable<PermutationWrapper> AllPermutations()
         {
             foreach (var perm in Permutations)

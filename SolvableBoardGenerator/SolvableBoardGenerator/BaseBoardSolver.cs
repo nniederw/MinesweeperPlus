@@ -13,7 +13,7 @@ namespace Minesweeper
     */
     public abstract class BaseBoardSolver : IBoardSolver
     {
-        protected Board Board;
+        protected IBoard Board;
         protected uint MineCount;
         protected bool[,] DiscoveredMines;
         protected sbyte[,] DiscoveredNumbers;
@@ -27,11 +27,11 @@ namespace Minesweeper
         public BaseBoardSolver()
         {
             SquaresCleared = 0;
-            Board = Board.GetEmptyBoard();
+            Board = Minesweeper.Board.GetEmptyBoard();
             DiscoveredMines = new bool[0, 0];
             DiscoveredNumbers = new sbyte[0, 0];
         }
-        public BaseBoardSolver(Board board, bool verboseLogging = false)
+        public BaseBoardSolver(IBoard board, bool verboseLogging = false)
         {
             if (board == null)
             {
@@ -41,7 +41,7 @@ namespace Minesweeper
             VerboseLogging = verboseLogging;
         }
         public void DisableAutoLoggingDuringPhases() => VerboseLoggingDuringPhasesForceDisable = true;
-        public void ChangeBoard(Board board)
+        public void ChangeBoard(IBoard board)
         {
             Board = board;
             MineCount = board.Mines;
@@ -60,9 +60,9 @@ namespace Minesweeper
         {
             VerboseLogging = verboseLogging;
         }
-        public abstract IBoardSolver Construct(Board board, bool verboseLogging = false);
+        //public abstract IBoardSolver Construct(IBoard board, bool verboseLogging = false);
         public virtual SolvabilityClass GetSolvabilityClass => SolvabilityClass.Unknown;
-        private static void TestConstruct<T>(Board board) where T : BaseBoardSolver
+       /* private static void TestConstruct<T>(Board board) where T : BaseBoardSolver
         {
             T solver = (T)Activator.CreateInstance(typeof(T), board, false)!; // create a test instance
             IBoardSolver constructed = solver.Construct(board, false);
@@ -74,18 +74,18 @@ namespace Minesweeper
             {
                 throw new InvalidOperationException($"Construct() did not return the same type! Expected {typeof(T)}, got {constructed.GetType()}. You probably forgot to override the Construct function in {typeof(T)} ");
             }
-        }
-        private void RunDynamicTestConstruct(Board board)
+        }*/
+        /*private void RunDynamicTestConstruct(IBoard board)
         {
             Type myType = this.GetType(); // runtime type of the current instance
             var method = typeof(BaseBoardSolver).GetMethod(nameof(TestConstruct), BindingFlags.NonPublic | BindingFlags.Static)!; // static TestConstruct<T>
             var generic = method.MakeGenericMethod(myType);
             generic.Invoke(null, new object[] { board });
-        }
+        }*/
         public virtual bool IsSolvable((int x, int y) startPos) => IsSolvable(startPos.x, startPos.y);
         public virtual bool IsSolvable(int startX, int startY)
         {
-            RunDynamicTestConstruct(Board);
+            //RunDynamicTestConstruct(Board);
             ResetSolver();
             try
             {

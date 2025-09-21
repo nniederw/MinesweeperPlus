@@ -130,8 +130,9 @@ foreach (var solvabel in SolvableBoards)
 List<string> solvableBoards = new List<string>();
 for (int i = 0; i < 224; i++)
 {
-    //Board b = BoardGenerator.GetRandomSeededBoard(BoardType.Expert, i);
-    Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(100, 100, 2100), i);
+    Board b = BoardGenerator.GetRandomSeededBoard(BoardType.Expert, i);
+    //Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(100, 100, 2100), i);
+    //Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(200, 200, 5000), i);
     //BoardConverter.PrettyPrintBoard(b);
     SmarterPermutationBuilderBoardSolver pSolver = new SmarterPermutationBuilderBoardSolver(b, false);
     //pSolver.SetBreakEarlyLogicChain(25);
@@ -140,8 +141,9 @@ for (int i = 0; i < 224; i++)
     var startPos = BoardChecker.FindFirstZero(b);
     var spbbs = new SmarterPermutationBuilderBoardSolver(b, true);
     spbbs.DisableAutoLoggingDuringPhases();
-    spbbs.IsSolvable(startPos);
-    BoardChecker.SolverComparer<EfficientSmartPermutationBuilderBoardSolver, SmarterPermutationBuilderBoardSolver>(b, startPos);
+    //spbbs.IsSolvable(startPos);
+    BoardChecker.BoardComparer<EfficientSmartPermutationBuilderBoardSolver>(b, b.ToBitArrayBoard(), startPos);
+    //BoardChecker.SolverComparer<EfficientSmartPermutationBuilderBoardSolver, SmarterPermutationBuilderBoardSolver>(b, startPos);
     /*
     //SmartPermutationBuilderBoardSolver pSolver = new SmartPermutationBuilderBoardSolver(b, false);
     var time = DateTime.Now;

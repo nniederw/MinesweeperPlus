@@ -2,8 +2,8 @@
 {
     public class PermutationBuilderBoardSolver : BaseBoardSolver
     {
-        public PermutationBuilderBoardSolver(Board board, bool verboseLogging = false) : base(board, verboseLogging) { }
-        public override IBoardSolver Construct(Board board, bool verboseLogging = false) => new PermutationBuilderBoardSolver(board, verboseLogging);
+        public PermutationBuilderBoardSolver(IBoard board, bool verboseLogging = false) : base(board, verboseLogging) { }
+        //public override IBoardSolver Construct(IBoard board, bool verboseLogging = false) => new PermutationBuilderBoardSolver(board, verboseLogging);
         protected override IEnumerable<Func<bool>> PhaseSequence()
         {
             yield return TestPS1;

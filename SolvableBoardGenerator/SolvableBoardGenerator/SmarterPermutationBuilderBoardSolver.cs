@@ -5,8 +5,8 @@
         private uint BreakEarlyLogicChain = uint.MaxValue;
         private uint MaxMergablePermutationCount = uint.MaxValue;
         public SmarterPermutationBuilderBoardSolver() : base() { }
-        public SmarterPermutationBuilderBoardSolver(Board board, bool verboseLogging = false) : base(board, verboseLogging) { }
-        public override IBoardSolver Construct(Board board, bool verboseLogging = false) => new SmarterPermutationBuilderBoardSolver(board, verboseLogging);
+        public SmarterPermutationBuilderBoardSolver(IBoard board, bool verboseLogging = false) : base(board, verboseLogging) { }
+        //public override IBoardSolver Construct(IBoard board, bool verboseLogging = false) => new SmarterPermutationBuilderBoardSolver(board, verboseLogging);
         public void SetBreakEarlyLogicChain(uint value)
         {
             BreakEarlyLogicChain = value;
@@ -20,6 +20,14 @@
             yield return TestPS1;
             yield return PermutationBuildingAlgorithm;
         }
+        private IEnumerable<MineRegionPermutationNode> GetRegionsFromActiveNumbers()
+            => ActiveNumbers.Select(i => MineRegionPNodeFromNumber(i));
+        private MineRegionPermutationNode MineRegionPNodeFromNumber((int x, int y) pos)
+        {
+            return new MineRegionPermutationNode(MineRegionPermutationFromNumber(pos), ConnectedNumbersWithConnectivity(pos));
+        }
+        private Dictionary<(int x, int y), MineRegionPermutationNode> RegionsDictionary = new Dictionary<(int x, int y), MineRegionPermutationNode>();
+        private bool IsBuiltRegion((int x, int y) pos) => RegionsDictionary.ContainsKey(pos);
         private bool PermutationBuildingAlgorithm()
         {
             var time = DateTime.Now;
@@ -27,6 +35,41 @@
             {
                 return false;
             }
+            RegionsDictionary.Clear();
+            RegionsDictionary.EnsureCapacity(ActiveNumbers.Count);
+            foreach (var mrpn in GetRegionsFromActiveNumbers())
+            {
+                var pos = mrpn.MineRegionPermutation.Numbers.Single(); ; //can only contain 1 number
+                RegionsDictionary.Add(pos, mrpn);
+                foreach (var edge in mrpn.ConnectedNodes.Where(i => IsBuiltRegion(i.pos)))
+                {
+                    if (edge.connectivity >= 2)
+                    {
+                        var other = RegionsDictionary[edge.pos];
+                        var merged = mrpn.MergeWith(other);
+                        RegionsDictionary[edge.pos] = merged;
+                        RegionsDictionary[pos] = merged;
+                        var infos = merged.MineRegionPermutation.GetInformation();
+                        if (infos.Any())
+                        {
+                            foreach (var info in infos)
+                            {
+                                if (info.mine)
+                                {
+                                    SetMine(info.pos);
+                                }
+                                else
+                                {
+                                    ClickSquare(info.pos);
+                                }
+                            }
+                            return true;
+                        }
+                        break;
+                    }
+                }
+            }
+
             //var regionsDict = new Dictionary<(int x, int y), LogicGraphNode>();
             Dictionary<(int x, int y), List<((int x, int y) pos, uint connectivity)>> Edges = new Dictionary<(int x, int y), List<((int x, int y) pos, uint connectivity)>>();
             foreach (var pos in ActiveNumbers)
@@ -186,7 +229,7 @@
                 {
                     if (VerboseLogging)
                     {
-                        Console.WriteLine($"Current logic had new information, breaking early. Had a total of {newMineRegionPermutation.Squares.Count()} numbers in logic.");
+                        Console.WriteLine($"Current logic had new information, breaking early. Had a total of {newMineRegionPermutation.Numbers.Count()} numbers in logic.");
                         PrintCurrentStateBoard();
                     }
                     return true;
@@ -213,18 +256,35 @@
         }
         private class MineRegionPermutationNode
         {
-            public List<MineRegionPermutationNode> ConnectedNodes = new List<MineRegionPermutationNode>();
+            public List<((int x, int y) pos, uint connectivity)> ConnectedNodes = new List<((int x, int y) pos, uint connectivity)>();
             public EfficientMineRegionPermutation MineRegionPermutation;
-            public MineRegionPermutationNode PointerToItself; //set this to the new node, when merging two nodes, such that references to this node can resolve the new merged node.
-            public uint NumbersCombined => (uint)MineRegionPermutation.Squares.Count();
+            public uint NumbersCombined => (uint)MineRegionPermutation.Numbers.Count();
             public MineRegionPermutationNode(EfficientMineRegionPermutation mineRegionPermutation)
             {
                 MineRegionPermutation = mineRegionPermutation;
-                PointerToItself = this;
             }
-            public void CheckConnectedNodesForUpdates()
+            public MineRegionPermutationNode(EfficientMineRegionPermutation mineRegionPermutation, IEnumerable<((int x, int y) pos, uint connectivity)> connectedNodes)
             {
-                ConnectedNodes = ConnectedNodes.Select(i => i.PointerToItself).ToList();
+                MineRegionPermutation = mineRegionPermutation;
+                ConnectedNodes = connectedNodes.ToList();
+            }
+            public MineRegionPermutationNode MergeWith(MineRegionPermutationNode other)
+                => Merge(this, other);
+            public static MineRegionPermutationNode Merge(MineRegionPermutationNode n1, MineRegionPermutationNode n2)
+            {
+                var perm = n1.MineRegionPermutation.Intersection(n2.MineRegionPermutation);
+                var numbers = perm.Numbers.ToHashSet();
+                var newEdgesHash = new Dictionary<(int x, int y), uint>(); // pos, connectivity
+                foreach (var edge in n1.ConnectedNodes.Union(n2.ConnectedNodes).Where(i => !numbers.Contains(i.pos)))
+                {
+                    if (newEdgesHash.ContainsKey(edge.pos))
+                    {
+                        newEdgesHash[edge.pos] += edge.connectivity;
+                        continue;
+                    }
+                    newEdgesHash.Add(edge.pos, edge.connectivity);
+                }
+                return new MineRegionPermutationNode(perm, newEdgesHash.AsEnumerable().Select(i => (i.Key, i.Value)));
             }
         }
         private class LogicGraphNode

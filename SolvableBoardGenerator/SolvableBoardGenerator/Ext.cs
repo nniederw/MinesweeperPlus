@@ -1,3 +1,6 @@
+using System.Collections;
+using System.Numerics;
+
 public static class Ext
 {
     public static void Assert(bool b)
@@ -122,6 +125,33 @@ public static class Ext
         }
     }
     public static IEnumerable<(A, B)> CartesianProduct<A, B>(this IEnumerable<A> aElements, IEnumerable<B> bElements) => aElements.SelectMany(a => bElements, (a, b) => (a, b));
+    public static IEnumerator<T> ToGeneric<T>(this IEnumerator enumerator)
+    {
+        while (enumerator.MoveNext())
+        {
+            yield return (T)enumerator.Current;
+        }
+    }
+    public static IEnumerable<T> ExceptT<T>(this IEnumerable<T> elements, T value)
+    {
+        foreach (var element in elements)
+        {
+            if (!element.Equals(value))
+            {
+                yield return element;
+            }
+        }
+    }
+    public static IEnumerable<T> ExceptT<T>(this IEnumerable<T> elements, T value1, T value2)
+    {
+        foreach (var element in elements)
+        {
+            if (!element.Equals(value1) && !element.Equals(value2)
+            {
+                yield return element;
+            }
+        }
+    }
     public static void ConsoleWriteColor(string msg, ConsoleColor? backColor = null, ConsoleColor? forColor = null)
     {
         var oldbc = Console.BackgroundColor;

@@ -5,8 +5,8 @@
         private uint BreakEarlyLogicChain = uint.MaxValue;
         private uint MaxMergablePermutationCount = uint.MaxValue;
         public EfficientSmartPermutationBuilderBoardSolver() : base() { }
-        public EfficientSmartPermutationBuilderBoardSolver(Board board, bool verboseLogging = false) : base(board, verboseLogging) { }
-        public override IBoardSolver Construct(Board board, bool verboseLogging = false) => new EfficientSmartPermutationBuilderBoardSolver(board, verboseLogging);
+        public EfficientSmartPermutationBuilderBoardSolver(IBoard board, bool verboseLogging = false) : base(board, verboseLogging) { }
+        //public override IBoardSolver Construct(IBoard board, bool verboseLogging = false) => new EfficientSmartPermutationBuilderBoardSolver(board, verboseLogging);
         public void SetBreakEarlyLogicChain(uint value)
         {
             BreakEarlyLogicChain = value;
@@ -85,7 +85,7 @@
                 {
                     if (VerboseLogging)
                     {
-                        Console.WriteLine($"Current logic had new information, breaking early. Had a total of {newMineRegionPermutation.Squares.Count()} numbers in logic.");
+                        Console.WriteLine($"Current logic had new information, breaking early. Had a total of {newMineRegionPermutation.Numbers.Count()} numbers in logic.");
                         PrintCurrentStateBoard();
                     }
                     return true;
@@ -115,7 +115,7 @@
             public List<MineRegionPermutationNode> ConnectedNodes = new List<MineRegionPermutationNode>();
             public EfficientMineRegionPermutation MineRegionPermutation;
             public MineRegionPermutationNode PointerToItself; //set this to the new node, when merging two nodes, such that references to this node can resolve the new merged node.
-            public uint NumbersCombined => (uint)MineRegionPermutation.Squares.Count();
+            public uint NumbersCombined => (uint)MineRegionPermutation.Numbers.Count();
             public MineRegionPermutationNode(EfficientMineRegionPermutation mineRegionPermutation)
             {
                 MineRegionPermutation = mineRegionPermutation;

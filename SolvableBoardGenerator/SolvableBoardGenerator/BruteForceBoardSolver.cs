@@ -3,8 +3,8 @@ namespace Minesweeper
     public class BruteForceBoardSolver : BaseBoardSolver
     {
         public BruteForceBoardSolver() : base() { }
-        public BruteForceBoardSolver(Board board, bool verboseLogging = false) : base(board, verboseLogging) { }
-        public override IBoardSolver Construct(Board board, bool verboseLogging = false) => new BruteForceBoardSolver(board, verboseLogging);
+        public BruteForceBoardSolver(IBoard board, bool verboseLogging = false) : base(board, verboseLogging) { }
+        //public override IBoardSolver Construct(IBoard board, bool verboseLogging = false) => new BruteForceBoardSolver(board, verboseLogging);
         public override SolvabilityClass GetSolvabilityClass => SolvabilityClass.Complete;
         protected override IEnumerable<Func<bool>> PhaseSequence()
         {
