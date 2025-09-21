@@ -6,6 +6,8 @@ namespace Minesweeper
         private IReadOnlyDictionary<(int x, int y), int> IndexLookupTable;
         private IReadOnlyList<BitArray> Permutations;
         private bool VerboseLogging = false;
+        private const uint StartOfProgressUpdates = 10000;
+        private const uint ProgressUpdateEvery = 10000;
         public EfficientMineRegionPermutation(uint mines, IEnumerable<(int x, int y)> region_, bool verboseLogging = false)
         {
             var region = region_.ToList();
@@ -28,7 +30,7 @@ namespace Minesweeper
             IndexLookupTable = indexLookupTable;
             VerboseLogging = verboseLogging;
         }
-        public IEnumerable<(int x, int y)> Numbers => IndexLookupTable.Keys;
+        public IEnumerable<(int x, int y)> SquaresInPermutation => IndexLookupTable.Keys;
         public IEnumerable<PermutationWrapper> AllPermutations()
         {
             foreach (var perm in Permutations)
@@ -42,16 +44,38 @@ namespace Minesweeper
         public static EfficientMineRegionPermutation Intersection(EfficientMineRegionPermutation p1, EfficientMineRegionPermutation p2)
         {
             bool verboseLogging = p1.VerboseLogging || p2.VerboseLogging;
+            uint MaxNewPermutations = p1.PermutationCount * p2.PermutationCount;
             if (verboseLogging)
             {
-                var p1C = p1.PermutationCount;
-                var p2C = p2.PermutationCount;
-                Console.WriteLine($"Intersecting two {nameof(EfficientMineRegionPermutation)}, with current valid permutations: {p1C} & {p2C}, giving a total of {p1C * p2C} possible permutations.");
+                Console.WriteLine($"Intersecting two {nameof(EfficientMineRegionPermutation)}, with current valid permutations: {p1.PermutationCount} & {p1.PermutationCount}, giving a total of {MaxNewPermutations} possible permutations.");
             }
             var possiblePermutations = p1.AllPermutations().CartesianProduct(p2.AllPermutations());
             var firstPPerm = possiblePermutations.First();
             var intersectionSquares = firstPPerm.Item1.SharedPositions(firstPPerm.Item2).ToList();
-            var validPermutations = possiblePermutations.Where(i => i.Item1.Intersectable(i.Item2, intersectionSquares));
+            IEnumerable<(PermutationWrapper, PermutationWrapper)> validPermutations;
+            if (verboseLogging && StartOfProgressUpdates <= p1.PermutationCount * p2.PermutationCount)
+            {
+                uint checkedPermutations = 0;
+                uint validPermutationCount = 0;
+                validPermutations = possiblePermutations.Where(i =>
+                {
+                    if (checkedPermutations % ProgressUpdateEvery == 0)
+                    {
+                        Console.WriteLine($"Checked a total of {checkedPermutations} ({((double)checkedPermutations) / MaxNewPermutations * 100.0}%), valid ones so far: {validPermutationCount} ({((double)validPermutationCount) / checkedPermutations * 100.0}%)");
+                    }
+                    checkedPermutations++;
+                    if (i.Item1.Intersectable(i.Item2, intersectionSquares))
+                    {
+                        validPermutationCount++;
+                        return true;
+                    }
+                    return false;
+                });
+            }
+            else
+            {
+                validPermutations = possiblePermutations.Where(i => i.Item1.Intersectable(i.Item2, intersectionSquares));
+            }
             var combinedLookupTable = firstPPerm.Item1.CombineLookupTables(firstPPerm.Item2.IndexLookupTable);
             var combinedPermutations = validPermutations.Select(i => i.Item1.Intersect(i.Item2, combinedLookupTable)).Select(i => i.Permutation);
             var res = new EfficientMineRegionPermutation(combinedPermutations, combinedLookupTable, verboseLogging);

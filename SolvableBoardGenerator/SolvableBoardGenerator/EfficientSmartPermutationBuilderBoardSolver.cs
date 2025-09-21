@@ -85,7 +85,7 @@
                 {
                     if (VerboseLogging)
                     {
-                        Console.WriteLine($"Current logic had new information, breaking early. Had a total of {newMineRegionPermutation.Numbers.Count()} numbers in logic.");
+                        Console.WriteLine($"Current logic had new information, breaking early. Had a total of {newMineRegionPermutation.SquaresInPermutation.Count()} numbers in logic.");
                         PrintCurrentStateBoard();
                     }
                     return true;
@@ -115,7 +115,7 @@
             public List<MineRegionPermutationNode> ConnectedNodes = new List<MineRegionPermutationNode>();
             public EfficientMineRegionPermutation MineRegionPermutation;
             public MineRegionPermutationNode PointerToItself; //set this to the new node, when merging two nodes, such that references to this node can resolve the new merged node.
-            public uint NumbersCombined => (uint)MineRegionPermutation.Numbers.Count();
+            public uint NumbersCombined => (uint)MineRegionPermutation.SquaresInPermutation.Count();
             public MineRegionPermutationNode(EfficientMineRegionPermutation mineRegionPermutation)
             {
                 MineRegionPermutation = mineRegionPermutation;

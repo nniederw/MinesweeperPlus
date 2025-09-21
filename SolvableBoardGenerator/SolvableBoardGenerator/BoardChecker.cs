@@ -115,7 +115,16 @@
             }
             return !different;
         }
-        public static void BoardComparer<Solver>(IBoard b1, IBoard b2, (int x, int y) startPos, bool verboseLogging = false) where Solver : IBoardSolver, new()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="Solver"></typeparam>
+        /// <param name="b1"></param>
+        /// <param name="b2"></param>
+        /// <param name="startPos"></param>
+        /// <param name="verboseLogging"></param>
+        /// <returns>Time of board 1 - time of board 2</returns>
+        public static TimeSpan BoardComparer<Solver>(IBoard b1, IBoard b2, (int x, int y) startPos, bool withoutPrint = false, bool verboseLogging = false) where Solver : IBoardSolver, new()
         {
             Solver solver1 = new Solver();
             solver1.SetVerboseLogging(verboseLogging);
@@ -129,14 +138,19 @@
             time = DateTime.Now;
             bool solvability2 = solver2.IsSolvable(startPos);
             var timeSolver2 = DateTime.Now - time;
-            Console.WriteLine($"Board 1: {timeSolver1.TotalMilliseconds}ms, Board 2: {timeSolver2.TotalMilliseconds}ms = {((double)timeSolver2.Ticks) / timeSolver1.Ticks * 100.0:F1}% of other board.");
+            if (!withoutPrint)
+            {
+                Console.WriteLine($"Board 1: {timeSolver1.TotalMilliseconds}ms, Board 2: {timeSolver2.TotalMilliseconds}ms = {((double)timeSolver2.Ticks) / timeSolver1.Ticks * 100.0:F1}% of other board.");
+            }
             if (solvability1 != solvability2)
             {
                 Ext.ConsoleWriteColor($"Board 1 has solvability {solvability1}, but Board 2 has solvability {solvability2}", ConsoleColor.Red);
                 Console.WriteLine();
             }
+            return timeSolver1 - timeSolver2;
         }
-        public static void SolverComparer<Solver1, Solver2>(Board b, (int x, int y) startPos, bool verboseLogging = false) where Solver1 : IBoardSolver, new() where Solver2 : IBoardSolver, new()
+        /// <returns>Time of solver 1 - time of solver 2</returns>
+        public static TimeSpan SolverComparer<Solver1, Solver2>(Board b, (int x, int y) startPos, bool withoutPrint = false, bool verboseLogging = false) where Solver1 : IBoardSolver, new() where Solver2 : IBoardSolver, new()
         {
             Solver1 solver1 = new Solver1();
             solver1.SetVerboseLogging(verboseLogging);
@@ -150,12 +164,16 @@
             time = DateTime.Now;
             bool solvability2 = solver2.IsSolvable(startPos);
             var timeSolver2 = DateTime.Now - time;
-            Console.WriteLine($"{typeof(Solver1).Name}: {timeSolver1.TotalMilliseconds}ms, {typeof(Solver2).Name}: {timeSolver2.TotalMilliseconds}ms = {((double)timeSolver2.Ticks) / timeSolver1.Ticks * 100.0:F1}% of other solver.");
+            if (!withoutPrint)
+            {
+                Console.WriteLine($"{typeof(Solver1).Name}: {timeSolver1.TotalMilliseconds}ms, {typeof(Solver2).Name}: {timeSolver2.TotalMilliseconds}ms = {((double)timeSolver2.Ticks) / timeSolver1.Ticks * 100.0:F1}% of other solver.");
+            }
             if (solvability1 != solvability2)
             {
                 Ext.ConsoleWriteColor($"{typeof(Solver1).Name} has solvability {solvability1}, but {typeof(Solver2).Name} has solvability {solvability2}", ConsoleColor.Red);
                 Console.WriteLine();
             }
+            return timeSolver1 - timeSolver2;
         }
         public static void SolverTester<TestSolver, CompleteSolver>(bool printBoards = false) where TestSolver : BaseBoardSolver, new() where CompleteSolver : BaseBoardSolver, new()
         {

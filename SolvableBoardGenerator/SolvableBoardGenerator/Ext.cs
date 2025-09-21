@@ -132,6 +132,24 @@ public static class Ext
             yield return (T)enumerator.Current;
         }
     }
+    public static IEnumerable<T> AsSingleEnumerable<T>(this T element)
+    {
+        yield return element;
+    }
+    public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> items)
+    {
+        foreach (var item in items)
+        {
+            collection.Add(item);
+        }
+    }
+    public static void RemoveRange<T>(this ICollection<T> collection, IEnumerable<T> items)
+    {
+        foreach (var item in items)
+        {
+            collection.Remove(item);
+        }
+    }
     public static IEnumerable<T> ExceptT<T>(this IEnumerable<T> elements, T value)
     {
         foreach (var element in elements)
@@ -146,7 +164,7 @@ public static class Ext
     {
         foreach (var element in elements)
         {
-            if (!element.Equals(value1) && !element.Equals(value2)
+            if (!element.Equals(value1) && !element.Equals(value2))
             {
                 yield return element;
             }

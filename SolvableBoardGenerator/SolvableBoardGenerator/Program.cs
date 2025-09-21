@@ -128,172 +128,92 @@ foreach (var solvabel in SolvableBoards)
 }
 //Console.ReadLine();
 List<string> solvableBoards = new List<string>();
-for (int i = 0; i < 224; i++)
+TimeSpan timeDifference = TimeSpan.Zero;
+bool firstTime = true;
+for (int i = 0; i < 0; i++)
+{
+    //Board b = BoardGenerator.GetRandomSeededBoard(BoardType.Expert, i);
+    Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(100, 100, 2100), i);
+    //Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(200, 200, 5000), i);
+    var startPos = BoardChecker.FindFirstZero(b);
+
+    TimeSpan t;
+    if (i % 2 == 1)
+    {
+        Console.Write("B,BAB:");
+        t = BoardChecker.BoardComparer<SmarterPermutationBuilderBoardSolver>(b, b.ToBitArrayBoard(), startPos);
+    }
+    else
+    {
+        Console.Write("BAB,B:");
+        t = BoardChecker.BoardComparer<SmarterPermutationBuilderBoardSolver>(b.ToBitArrayBoard(), b, startPos);
+        t = t * -1.0;
+    }
+    if (firstTime)
+    {
+        firstTime = false;
+        continue;
+    }
+    timeDifference += t;
+    if (i % 10 == 0)
+    {
+        Console.WriteLine($"Current time saving of BitArrayBoard: {timeDifference.TotalMilliseconds}ms (positive = BitArrayBoard is faster)");
+    }
+}
+timeDifference = TimeSpan.Zero;
+firstTime = true;
+bool switchEvenOdd = false;
+for (int i = 0; i < 0; i++)
 {
     Board b = BoardGenerator.GetRandomSeededBoard(BoardType.Expert, i);
     //Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(100, 100, 2100), i);
     //Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(200, 200, 5000), i);
-    //BoardConverter.PrettyPrintBoard(b);
-    SmarterPermutationBuilderBoardSolver pSolver = new SmarterPermutationBuilderBoardSolver(b, false);
-    //pSolver.SetBreakEarlyLogicChain(25);
-    //pSolver.SetMaxMergablePermutationCount(100000);
-    pSolver.DisableAutoLoggingDuringPhases();
     var startPos = BoardChecker.FindFirstZero(b);
-    var spbbs = new SmarterPermutationBuilderBoardSolver(b, true);
-    spbbs.DisableAutoLoggingDuringPhases();
-    //spbbs.IsSolvable(startPos);
-    BoardChecker.BoardComparer<EfficientSmartPermutationBuilderBoardSolver>(b, b.ToBitArrayBoard(), startPos);
-    //BoardChecker.SolverComparer<EfficientSmartPermutationBuilderBoardSolver, SmarterPermutationBuilderBoardSolver>(b, startPos);
-    /*
-    //SmartPermutationBuilderBoardSolver pSolver = new SmartPermutationBuilderBoardSolver(b, false);
-    var time = DateTime.Now;
-    bool solvableFromCurPos = pSolver.IsSolvable(x, y);
-    var solveTime = DateTime.Now - time;
-    Console.WriteLine($"Took {solveTime.TotalMilliseconds}ms");
-    EfficientSmartPermutationBuilderBoardSolver epSolver = new EfficientSmartPermutationBuilderBoardSolver(b, false);
-    //epSolver.SetBreakEarlyLogicChain(30);
-    //epSolver.SetMaxMergablePermutationCount(100000);
-    epSolver.DisableAutoLoggingDuringPhases();
-    time = DateTime.Now;
-    bool solvableFromCurPos2 = epSolver.IsSolvable(x, y);
-    var solveTime2 = DateTime.Now - time;
-    var str = $"[{i}] Solvetime smarter: {solveTime.TotalMilliseconds}ms, solvetime efficient: {solveTime2.TotalMilliseconds}ms, solvable smarter: {solvableFromCurPos}, solvable efficient: {solvableFromCurPos2}";
-    if (solvableFromCurPos != solvableFromCurPos2 || solveTime2 > solveTime)
+    TimeSpan t;
+    if (!switchEvenOdd || i % 2 == 0)
     {
-        Ext.ConsoleWriteColor(str, ConsoleColor.Red);
-        //Console.WriteLine();
+        t = BoardChecker.SolverComparer<EfficientSmartPermutationBuilderBoardSolver, SmarterPermutationBuilderBoardSolver>(b, startPos);
     }
     else
     {
-        Console.WriteLine(str);
+        t = BoardChecker.SolverComparer<SmarterPermutationBuilderBoardSolver, EfficientSmartPermutationBuilderBoardSolver>(b, startPos);
+        t = t * -1.0;
     }
-    if (solvableFromCurPos)
+    if (firstTime)
     {
-        Console.WriteLine($"{i}, ({x},{y}) is solvable.");*/
-    /*
-    solvableBoards.Add($"Board {i} is solvable at ({x},{y}), solved in {solveTime.TotalMilliseconds}ms.");
-    Console.WriteLine();
-    foreach (string s in solvableBoards)
-    {
-        Ext.ConsoleWriteColor(s, ConsoleColor.Red);
-        Console.WriteLine();
+        firstTime = false;
+        continue;
     }
-    Console.WriteLine();
-    Console.WriteLine();*/
-    /*}
-        else
-        {
-            //Console.WriteLine($"Board {i} isn't solvable at ({x},{y}), finished in {solveTime.TotalMilliseconds}ms. Was able to clear {pSolver.PercentageCleared}%");
-        }*/
+    timeDifference += t;
+    if (i % 10 == 0)
+    {
+        Console.WriteLine($"Current time saving of SmarterPermutationBuilderBoardSolver: {timeDifference.TotalMilliseconds}ms (positive = SmarterPermutationBuilderBoardSolver is faster)");
+    }
 }
-/*
-for (int i = 3; i < 2000; i++)
+var lastTime = DateTime.Now;
+const uint update = 2000;
+for (int i = 0; i < 10000000; i++)
 {
+    //Board b = BoardGenerator.GetRandomSeededBoard(BoardType.Expert, i);
     Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(100, 100, 2100), i);
-    int x, y;
-    (x, y) = BoardChecker.FindFirstZero(b);
-    SmartPermutationBuilderBoardSolver pSolver = new SmartPermutationBuilderBoardSolver(b, true);
-    pSolver.DisableAutoLoggingDuringPhases();
+    //Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(200, 200, 5000), i);
+    var startPos = BoardChecker.FindFirstZero(b);
+    var solver = new SmarterPermutationBuilderBoardSolver(b, false);
+    solver.DisableAutoLoggingDuringPhases();
     var time = DateTime.Now;
-    bool solvableFromCurPos = pSolver.IsSolvable(x, y);
+    var solvable = solver.IsSolvable(startPos);
     var solveTime = DateTime.Now - time;
-    if (solvableFromCurPos)
+    if (solveTime.TotalSeconds > 1.0)
     {
-        Console.WriteLine($"Board {i} is solvable at ({x},{y}), solved in {solveTime.TotalMilliseconds}ms:");
-        //BoardConverter.PrettyPrintBoard(b);
-        //var pS = new PermutationBuilderBoardSolver(b, true);
-        //pS.IsSolvable(x, y);
+        Console.WriteLine($"Took {solveTime.TotalSeconds}s for board {i}");
     }
-    Console.WriteLine($"Board {i} isn't solvable at ({x},{y}), finished in {solveTime.TotalMilliseconds}ms:");
-}*/
-
-/*for (int i = 0; i < 2000; i++)
-{
-    Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(100, 100, 2100), i);
-    bool solvable = false;
-    for (int x = 0; x < b.SizeX; x++)
+    if (i % update == 0)
     {
-        for (int y = 0; y < b.SizeY; y++)
-        {
-            if (b.CheatGetNumbers()[x, y] == 0)
-            {
-                PermutationBuilderBoardSolver pSolver = new PermutationBuilderBoardSolver(b);
-                var time = DateTime.Now;
-                bool solvableFromCurPos = pSolver.IsSolvable(x, y);
-                var solveTime = DateTime.Now - time;
-                if (solvableFromCurPos)
-                {
-                    solvable = true;
-                    Console.WriteLine($"Board {i} is solvable at ({x},{y}), solved in {solveTime.TotalMilliseconds}ms:");
-                    //BoardConverter.PrettyPrintBoard(b);
-                    //var pS = new PermutationBuilderBoardSolver(b, true);
-                    //pS.IsSolvable(x, y);
-                    break;
-                }
-            }
-        }
-        if (solvable) { break; }
+        Console.WriteLine($"Checked up to board {i}, took {(DateTime.Now - lastTime).TotalSeconds}s, since last update.");
+        lastTime = DateTime.Now;
     }
-    if (!solvable)
+    if (solvable)
     {
-        Console.WriteLine($"Board {i} wasn't solvable");
+        Console.WriteLine($"Solvable board found [seed,(x,y)]: {i},({startPos.x},{startPos.y})");
     }
-}*/
-//Board board = BoardGenerator.GetRandomSeededBoard(BoardType.Expert, 82);
-//Board board = BoardGenerator.GetRandomSeededBoard(BoardType.Expert, 42);
-//BoardConverter.PrettyPrintBoard(board);
-//EdgeBruteForceBoardSolver solver = new EdgeBruteForceBoardSolver(board, true);
-//PermutationBuilderBoardSolver solver = new PermutationBuilderBoardSolver(board, true);
-//solver.IsSolvable(14, 0);
-//solver.IsSolvable(15, 9);
-//solver.PrintCurrentStateBoard();
-//Board board = new Board(BoardGenerator.GetRandomSeededBoard(20, 30, 99, 0));
-/*
-const uint width = 16;
-const uint height = 16;
-const uint mines = 25;
-int[,] solvableScore = new int[16, 16];
-for (int i = 100030; i < 5000000; i++)
-{
-    var bboard = BoardGenerator.GetRandomSeededBoard(width, height, mines, i);
-    Board board = new Board(bboard);
-    //BoardConverter.PrettyPrintBoard(board);
-    var solvable = BoardChecker.CheckBoard(board, true);
-    for (int x = 0; x < width; x++)
-    {
-        for (int y = 0; y < height; y++)
-        {
-            if (bboard[x, y]) { continue; }
-            solvableScore[x, y] += solvable[x, y] ? 1 : -1;
-        }
-    }
-
-    if (i % 30 == 0)
-    {
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                Console.Write($"{solvableScore[x, y]},");
-            }
-            Console.WriteLine();
-        }
-    }
-    BoardConverter.PrettyPrintBoard(board, solvable);
-    Console.WriteLine("Press enter to continue");
-    Console.ReadLine();
-    Console.WriteLine($"Checked board {i}");
-
 }
-Console.WriteLine("End reached");
-for (int x = 0; x < width; x++)
-{
-    for (int y = 0; y < height; y++)
-    {
-        Console.Write($"{solvableScore[x, y]},");
-    }
-    Console.WriteLine();
-}
-
-var wait = Console.ReadLine();
-*/

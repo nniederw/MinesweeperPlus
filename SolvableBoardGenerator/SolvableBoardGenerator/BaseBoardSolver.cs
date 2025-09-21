@@ -62,19 +62,19 @@ namespace Minesweeper
         }
         //public abstract IBoardSolver Construct(IBoard board, bool verboseLogging = false);
         public virtual SolvabilityClass GetSolvabilityClass => SolvabilityClass.Unknown;
-       /* private static void TestConstruct<T>(Board board) where T : BaseBoardSolver
-        {
-            T solver = (T)Activator.CreateInstance(typeof(T), board, false)!; // create a test instance
-            IBoardSolver constructed = solver.Construct(board, false);
-            if (constructed == null)
-            {
-                throw new InvalidOperationException($"Construct() did not return the same type! Expected {typeof(T)}, got null. You probably forgot to override the Construct function in {typeof(T)}, or let it return null.");
-            }
-            if (constructed.GetType() != typeof(T))
-            {
-                throw new InvalidOperationException($"Construct() did not return the same type! Expected {typeof(T)}, got {constructed.GetType()}. You probably forgot to override the Construct function in {typeof(T)} ");
-            }
-        }*/
+        /* private static void TestConstruct<T>(Board board) where T : BaseBoardSolver
+         {
+             T solver = (T)Activator.CreateInstance(typeof(T), board, false)!; // create a test instance
+             IBoardSolver constructed = solver.Construct(board, false);
+             if (constructed == null)
+             {
+                 throw new InvalidOperationException($"Construct() did not return the same type! Expected {typeof(T)}, got null. You probably forgot to override the Construct function in {typeof(T)}, or let it return null.");
+             }
+             if (constructed.GetType() != typeof(T))
+             {
+                 throw new InvalidOperationException($"Construct() did not return the same type! Expected {typeof(T)}, got {constructed.GetType()}. You probably forgot to override the Construct function in {typeof(T)} ");
+             }
+         }*/
         /*private void RunDynamicTestConstruct(IBoard board)
         {
             Type myType = this.GetType(); // runtime type of the current instance
@@ -221,14 +221,16 @@ namespace Minesweeper
         /// Intended for opened squares only.
         /// Connectivity returned is how many squares are shared between the two numbers.
         /// </summary>
-        protected IEnumerable<((int x, int y) pos, uint connectivity)> ConnectedNumbersWithConnectivity((int x, int y) pos)
+        protected IEnumerable<((int x, int y) pos, IReadOnlyList<(int x, int y)> connectedSquares)> ConnectedActiveNonMineNumbers((int x, int y) pos)
+            => ConnectedNumbersWithConnectivity(pos).Where(i => ActiveNumbers.Contains(i.pos)).Select(i => (i.pos, (IReadOnlyList<(int x, int y)>)i.connectedSquares.Where(i => !IsSetMine(i)).ToList())).Where(i => i.Item2.Any());
+        protected IEnumerable<((int x, int y) pos, IReadOnlyList<(int x, int y)> connectedSquares)> ConnectedNumbersWithConnectivity((int x, int y) pos)
         {
             var neighbors = GetUnopenedNeighbors(pos).ToList();
-            var neighborsOfNeighbors = neighbors.SelectMany(i => GetOpenedNeighbors(i)).GroupBy(i => (i.x, i.y));
+            var neighborsOfNeighbors = neighbors.SelectMany(i => (GetOpenedNeighbors(i).CartesianProduct(i.AsSingleEnumerable()))).GroupBy(i => (i.Item1.x, i.Item1.y));
             foreach (var group in neighborsOfNeighbors)
             {
                 if (group.Key == pos) { continue; }
-                yield return (group.Key, (uint)group.Count());
+                yield return (group.Key, group.Select(i => i.Item2).ToList());
             }
         }
         /// <summary>
