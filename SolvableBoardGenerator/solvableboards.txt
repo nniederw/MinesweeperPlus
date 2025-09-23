@@ -1,0 +1,360 @@
+should be size 100 x 100 with 2100 mines
+Checked up to board 0, took 0.2543639s, since last update.
+Solvable board found [seed,(x,y)]: 121,(0,0)
+Checked up to board 2000, took 120.555282s, since last update.
+Solvable board found [seed,(x,y)]: 3828,(0,3)
+Checked up to board 4000, took 114.0173032s, since last update.
+Checked up to board 6000, took 114.9219424s, since last update.
+Solvable board found [seed,(x,y)]: 7865,(0,0)
+Checked up to board 8000, took 114.7360939s, since last update.
+Solvable board found [seed,(x,y)]: 9415,(0,0)
+Checked up to board 10000, took 108.4319818s, since last update.
+Checked up to board 12000, took 108.2412838s, since last update.
+Checked up to board 14000, took 109.7066507s, since last update.
+Solvable board found [seed,(x,y)]: 14399,(0,2)
+Solvable board found [seed,(x,y)]: 15548,(0,0)
+Checked up to board 16000, took 115.3722535s, since last update.
+Solvable board found [seed,(x,y)]: 16629,(0,3)
+Checked up to board 18000, took 115.6989787s, since last update.
+Checked up to board 20000, took 111.3522807s, since last update.
+Checked up to board 22000, took 112.1984569s, since last update.
+Checked up to board 24000, took 111.5565406s, since last update.
+Checked up to board 26000, took 113.904852s, since last update.
+Checked up to board 28000, took 119.6470142s, since last update.
+Checked up to board 30000, took 117.1560486s, since last update.
+Solvable board found [seed,(x,y)]: 30775,(0,4)
+Solvable board found [seed,(x,y)]: 31799,(0,0)
+Checked up to board 32000, took 111.3326575s, since last update.
+Checked up to board 34000, took 120.279178s, since last update.
+Solvable board found [seed,(x,y)]: 35750,(0,0)
+Checked up to board 36000, took 114.7259601s, since last update.
+Checked up to board 38000, took 115.8288887s, since last update.
+Solvable board found [seed,(x,y)]: 38850,(0,5)
+Checked up to board 40000, took 113.8523091s, since last update.
+Checked up to board 42000, took 115.8796239s, since last update.
+Solvable board found [seed,(x,y)]: 42540,(0,3)
+Checked up to board 44000, took 115.3632107s, since last update.
+Checked up to board 46000, took 111.8196387s, since last update.
+Checked up to board 48000, took 116.9910384s, since last update.
+Checked up to board 50000, took 107.920644s, since last update.
+Checked up to board 52000, took 109.691001s, since last update.
+Checked up to board 54000, took 118.5762239s, since last update.
+Solvable board found [seed,(x,y)]: 54338,(0,0)
+Checked up to board 56000, took 111.3325769s, since last update.
+Solvable board found [seed,(x,y)]: 56017,(0,0)
+Checked up to board 58000, took 112.7494971s, since last update.
+Solvable board found [seed,(x,y)]: 58892,(0,8)
+Checked up to board 60000, took 109.3579133s, since last update.
+Checked up to board 62000, took 115.0468801s, since last update.
+Checked up to board 64000, took 115.2928751s, since last update.
+Checked up to board 66000, took 111.9916544s, since last update.
+Checked up to board 68000, took 115.2177378s, since last update.
+Solvable board found [seed,(x,y)]: 68689,(0,0)
+Checked up to board 70000, took 112.8085221s, since last update.
+Solvable board found [seed,(x,y)]: 70812,(0,0)
+Checked up to board 72000, took 110.5222633s, since last update.
+Checked up to board 74000, took 117.3076624s, since last update.
+Checked up to board 76000, took 114.5346817s, since last update.
+Solvable board found [seed,(x,y)]: 76477,(0,0)
+Checked up to board 78000, took 116.5336164s, since last update.
+Solvable board found [seed,(x,y)]: 79549,(0,2)
+Checked up to board 80000, took 113.2605174s, since last update.
+Checked up to board 82000, took 112.2678446s, since last update.
+Checked up to board 84000, took 115.2168608s, since last update.
+Checked up to board 86000, took 110.4842178s, since last update.
+Checked up to board 88000, took 112.2206746s, since last update.
+Checked up to board 90000, took 112.9599441s, since last update.
+Checked up to board 92000, took 112.7946292s, since last update.
+Checked up to board 94000, took 112.2651166s, since last update.
+Checked up to board 96000, took 112.582284s, since last update.
+Checked up to board 98000, took 115.4792489s, since last update.
+Checked up to board 100000, took 115.3120861s, since last update.
+Checked up to board 102000, took 112.8634728s, since last update.
+Solvable board found [seed,(x,y)]: 102496,(0,3)
+Solvable board found [seed,(x,y)]: 103568,(0,0)
+Checked up to board 104000, took 111.0637779s, since last update.
+Solvable board found [seed,(x,y)]: 104270,(0,3)
+Checked up to board 106000, took 117.0935321s, since last update.
+Solvable board found [seed,(x,y)]: 106177,(0,3)
+Checked up to board 108000, took 117.3196191s, since last update.
+Solvable board found [seed,(x,y)]: 108769,(0,2)
+Checked up to board 110000, took 116.9591541s, since last update.
+Solvable board found [seed,(x,y)]: 111615,(0,0)
+Checked up to board 112000, took 112.0282304s, since last update.
+Checked up to board 114000, took 116.8001899s, since last update.
+Solvable board found [seed,(x,y)]: 114103,(0,9)
+Solvable board found [seed,(x,y)]: 114899,(0,0)
+Checked up to board 116000, took 111.1197454s, since last update.
+Solvable board found [seed,(x,y)]: 117735,(0,0)
+Checked up to board 118000, took 114.4374332s, since last update.
+Solvable board found [seed,(x,y)]: 118222,(0,0)
+Checked up to board 120000, took 114.4863871s, since last update.
+Solvable board found [seed,(x,y)]: 120656,(0,0)
+Checked up to board 122000, took 112.0755526s, since last update.
+Solvable board found [seed,(x,y)]: 123455,(0,8)
+Checked up to board 124000, took 115.6704956s, since last update.
+Checked up to board 126000, took 112.5321567s, since last update.
+Checked up to board 128000, took 108.1721171s, since last update.
+Checked up to board 130000, took 111.399207s, since last update.
+Solvable board found [seed,(x,y)]: 131117,(0,3)
+Checked up to board 132000, took 110.780026s, since last update.
+Checked up to board 134000, took 110.9576898s, since last update.
+Checked up to board 136000, took 115.0871256s, since last update.
+Checked up to board 138000, took 113.0018833s, since last update.
+Checked up to board 140000, took 109.4894359s, since last update.
+Solvable board found [seed,(x,y)]: 140661,(0,0)
+Checked up to board 142000, took 112.0060104s, since last update.
+Checked up to board 144000, took 114.604147s, since last update.
+Checked up to board 146000, took 117.0694393s, since last update.
+Checked up to board 148000, took 116.5350558s, since last update.
+Solvable board found [seed,(x,y)]: 148467,(0,0)
+Checked up to board 150000, took 115.5229433s, since last update.
+Checked up to board 152000, took 110.7250669s, since last update.
+Solvable board found [seed,(x,y)]: 153789,(0,15)
+Checked up to board 154000, took 110.4984318s, since last update.
+Solvable board found [seed,(x,y)]: 155281,(0,5)
+Checked up to board 156000, took 112.736271s, since last update.
+Solvable board found [seed,(x,y)]: 157430,(0,3)
+Checked up to board 158000, took 114.7727221s, since last update.
+Checked up to board 160000, took 117.4993948s, since last update.
+Solvable board found [seed,(x,y)]: 161132,(0,19)
+Solvable board found [seed,(x,y)]: 161433,(0,0)
+Checked up to board 162000, took 112.6349307s, since last update.
+Checked up to board 164000, took 113.4334476s, since last update.
+Checked up to board 166000, took 118.9924733s, since last update.
+Checked up to board 168000, took 111.250944s, since last update.
+Solvable board found [seed,(x,y)]: 169919,(0,0)
+Checked up to board 170000, took 117.4648865s, since last update.
+Checked up to board 172000, took 115.1173161s, since last update.
+Checked up to board 174000, took 112.7475554s, since last update.
+Checked up to board 176000, took 113.6789317s, since last update.
+Checked up to board 178000, took 111.2474409s, since last update.
+Solvable board found [seed,(x,y)]: 179605,(0,0)
+Checked up to board 180000, took 111.5254798s, since last update.
+Solvable board found [seed,(x,y)]: 181728,(0,5)
+Checked up to board 182000, took 112.073248s, since last update.
+Checked up to board 184000, took 116.1747152s, since last update.
+Checked up to board 186000, took 116.1951131s, since last update.
+Checked up to board 188000, took 115.2943138s, since last update.
+Solvable board found [seed,(x,y)]: 188363,(0,3)
+Checked up to board 190000, took 115.6816163s, since last update.
+Checked up to board 192000, took 111.5881415s, since last update.
+Checked up to board 194000, took 116.8687821s, since last update.
+Checked up to board 196000, took 114.3652015s, since last update.
+Checked up to board 198000, took 116.6538823s, since last update.
+Solvable board found [seed,(x,y)]: 198725,(0,0)
+Solvable board found [seed,(x,y)]: 199003,(0,5)
+Checked up to board 200000, took 107.6048623s, since last update.
+Checked up to board 202000, took 115.7993804s, since last update.
+Checked up to board 204000, took 115.5384131s, since last update.
+Checked up to board 206000, took 114.6216336s, since last update.
+Checked up to board 208000, took 115.6329722s, since last update.
+Checked up to board 210000, took 112.750437s, since last update.
+Checked up to board 212000, took 111.6095976s, since last update.
+Checked up to board 214000, took 113.2561251s, since last update.
+Checked up to board 216000, took 113.8730437s, since last update.
+Checked up to board 218000, took 109.8202402s, since last update.
+Checked up to board 220000, took 117.1337409s, since last update.
+Checked up to board 222000, took 115.1848387s, since last update.
+Checked up to board 224000, took 117.4800898s, since last update.
+Checked up to board 226000, took 116.2936232s, since last update.
+Checked up to board 228000, took 118.625291s, since last update.
+Checked up to board 230000, took 111.3491897s, since last update.
+Checked up to board 232000, took 118.5116373s, since last update.
+Checked up to board 234000, took 114.8603209s, since last update.
+Checked up to board 236000, took 116.8102522s, since last update.
+Solvable board found [seed,(x,y)]: 237890,(0,20)
+Checked up to board 238000, took 115.6900156s, since last update.
+Checked up to board 240000, took 113.9305464s, since last update.
+Checked up to board 242000, took 112.7282233s, since last update.
+Checked up to board 244000, took 115.4987908s, since last update.
+Checked up to board 246000, took 115.3736791s, since last update.
+Checked up to board 248000, took 119.775303s, since last update.
+Solvable board found [seed,(x,y)]: 248617,(0,0)
+Checked up to board 250000, took 112.7702946s, since last update.
+Checked up to board 252000, took 114.8986175s, since last update.
+Checked up to board 254000, took 113.4885557s, since last update.
+Solvable board found [seed,(x,y)]: 254929,(0,6)
+Checked up to board 256000, took 115.3101292s, since last update.
+Checked up to board 258000, took 114.1605081s, since last update.
+Solvable board found [seed,(x,y)]: 259398,(0,3)
+Checked up to board 260000, took 112.4147796s, since last update.
+Checked up to board 262000, took 112.9852959s, since last update.
+Solvable board found [seed,(x,y)]: 262796,(0,16)
+Checked up to board 264000, took 115.9077979s, since last update.
+Checked up to board 266000, took 114.0969971s, since last update.
+Checked up to board 268000, took 115.6543939s, since last update.
+Checked up to board 270000, took 114.1660944s, since last update.
+Checked up to board 272000, took 117.5288792s, since last update.
+Checked up to board 274000, took 115.2605752s, since last update.
+Solvable board found [seed,(x,y)]: 274273,(0,10)
+Checked up to board 276000, took 117.2209186s, since last update.
+Solvable board found [seed,(x,y)]: 277143,(0,2)
+Checked up to board 278000, took 111.8844537s, since last update.
+Checked up to board 280000, took 115.181172s, since last update.
+Checked up to board 282000, took 110.4233966s, since last update.
+Checked up to board 284000, took 111.907963s, since last update.
+Solvable board found [seed,(x,y)]: 284175,(0,21)
+Checked up to board 286000, took 114.8109599s, since last update.
+Solvable board found [seed,(x,y)]: 287707,(0,2)
+Checked up to board 288000, took 114.2608858s, since last update.
+Checked up to board 290000, took 117.2444602s, since last update.
+Solvable board found [seed,(x,y)]: 290941,(0,0)
+Checked up to board 292000, took 115.6578692s, since last update.
+Checked up to board 294000, took 113.1011142s, since last update.
+Checked up to board 296000, took 112.8904211s, since last update.
+Checked up to board 298000, took 111.2641522s, since last update.
+Checked up to board 300000, took 115.1226816s, since last update.
+Checked up to board 302000, took 116.4144945s, since last update.
+Checked up to board 304000, took 110.9204376s, since last update.
+Checked up to board 306000, took 114.8070798s, since last update.
+Checked up to board 308000, took 115.4571518s, since last update.
+Checked up to board 310000, took 112.8700756s, since last update.
+Solvable board found [seed,(x,y)]: 310332,(0,9)
+Checked up to board 312000, took 111.2976964s, since last update.
+Checked up to board 314000, took 117.2197459s, since last update.
+Checked up to board 316000, took 111.8283147s, since last update.
+Checked up to board 318000, took 114.5265735s, since last update.
+Solvable board found [seed,(x,y)]: 319298,(0,2)
+Checked up to board 320000, took 118.2652609s, since last update.
+Solvable board found [seed,(x,y)]: 321726,(0,0)
+Checked up to board 322000, took 114.4339723s, since last update.
+Checked up to board 324000, took 108.4002309s, since last update.
+Checked up to board 326000, took 110.9884088s, since last update.
+Solvable board found [seed,(x,y)]: 326812,(0,0)
+Checked up to board 328000, took 112.4313243s, since last update.
+Solvable board found [seed,(x,y)]: 329260,(0,0)
+Checked up to board 330000, took 113.3521851s, since last update.
+Solvable board found [seed,(x,y)]: 331101,(0,3)
+Checked up to board 332000, took 114.419163s, since last update.
+Checked up to board 334000, took 115.4894565s, since last update.
+Checked up to board 336000, took 116.1587681s, since last update.
+Checked up to board 338000, took 115.3548231s, since last update.
+Checked up to board 340000, took 112.7749087s, since last update.
+Checked up to board 342000, took 117.761153s, since last update.
+Checked up to board 344000, took 115.634578s, since last update.
+Checked up to board 346000, took 118.6808108s, since last update.
+Checked up to board 348000, took 117.2225888s, since last update.
+Checked up to board 350000, took 115.0701466s, since last update.
+Checked up to board 352000, took 121.1883145s, since last update.
+Checked up to board 354000, took 114.730643s, since last update.
+Solvable board found [seed,(x,y)]: 355182,(0,0)
+Checked up to board 356000, took 114.6461119s, since last update.
+Checked up to board 358000, took 113.6481052s, since last update.
+Checked up to board 360000, took 112.2226625s, since last update.
+Checked up to board 362000, took 115.6769068s, since last update.
+Checked up to board 364000, took 112.169905s, since last update.
+Checked up to board 366000, took 117.3161578s, since last update.
+Checked up to board 368000, took 112.5000909s, since last update.
+Solvable board found [seed,(x,y)]: 369789,(0,0)
+Checked up to board 370000, took 110.2262144s, since last update.
+Solvable board found [seed,(x,y)]: 371772,(0,0)
+Checked up to board 372000, took 114.3840129s, since last update.
+Checked up to board 374000, took 110.7136481s, since last update.
+Checked up to board 376000, took 113.5804233s, since last update.
+Checked up to board 378000, took 109.989373s, since last update.
+Checked up to board 380000, took 113.5438801s, since last update.
+Checked up to board 382000, took 115.0883354s, since last update.
+Checked up to board 384000, took 112.0633694s, since last update.
+Solvable board found [seed,(x,y)]: 385476,(0,8)
+Checked up to board 386000, took 118.0943982s, since last update.
+Solvable board found [seed,(x,y)]: 387044,(0,0)
+Checked up to board 388000, took 118.8667906s, since last update.
+Checked up to board 390000, took 109.4489299s, since last update.
+Checked up to board 392000, took 112.8705666s, since last update.
+Solvable board found [seed,(x,y)]: 393261,(0,13)
+Checked up to board 394000, took 112.4766004s, since last update.
+Checked up to board 396000, took 113.7548796s, since last update.
+Checked up to board 398000, took 119.7893157s, since last update.
+Checked up to board 400000, took 113.1744385s, since last update.
+Checked up to board 402000, took 115.1897625s, since last update.
+Checked up to board 404000, took 111.588888s, since last update.
+Checked up to board 406000, took 118.3925847s, since last update.
+Checked up to board 408000, took 111.4545655s, since last update.
+Checked up to board 410000, took 116.6602333s, since last update.
+Checked up to board 412000, took 115.6048095s, since last update.
+Checked up to board 414000, took 113.5463663s, since last update.
+Solvable board found [seed,(x,y)]: 415039,(0,14)
+Checked up to board 416000, took 111.9591539s, since last update.
+Checked up to board 418000, took 117.8711318s, since last update.
+Solvable board found [seed,(x,y)]: 418965,(0,0)
+Checked up to board 420000, took 114.7148675s, since last update.
+Checked up to board 422000, took 114.6700254s, since last update.
+Checked up to board 424000, took 113.2389146s, since last update.
+Checked up to board 426000, took 115.1787949s, since last update.
+Checked up to board 428000, took 118.672238s, since last update.
+Checked up to board 430000, took 113.5503136s, since last update.
+Checked up to board 432000, took 115.9756639s, since last update.
+Checked up to board 434000, took 113.549987s, since last update.
+Checked up to board 436000, took 114.3840655s, since last update.
+Checked up to board 438000, took 114.1336609s, since last update.
+Solvable board found [seed,(x,y)]: 439861,(0,0)
+Checked up to board 440000, took 111.2518296s, since last update.
+Checked up to board 442000, took 113.0239273s, since last update.
+Checked up to board 444000, took 115.0655356s, since last update.
+Checked up to board 446000, took 112.9642348s, since last update.
+Checked up to board 448000, took 111.2332388s, since last update.
+Solvable board found [seed,(x,y)]: 448789,(0,0)
+Checked up to board 450000, took 116.7739742s, since last update.
+Checked up to board 452000, took 110.8216661s, since last update.
+Checked up to board 454000, took 110.2762993s, since last update.
+Solvable board found [seed,(x,y)]: 455172,(0,9)
+Checked up to board 456000, took 113.1719092s, since last update.
+Checked up to board 458000, took 114.8242201s, since last update.
+Checked up to board 460000, took 115.0472523s, since last update.
+Solvable board found [seed,(x,y)]: 461357,(0,0)
+Solvable board found [seed,(x,y)]: 461674,(0,0)
+Checked up to board 462000, took 113.4020149s, since last update.
+Checked up to board 464000, took 115.0436194s, since last update.
+Solvable board found [seed,(x,y)]: 465782,(0,15)
+Checked up to board 466000, took 112.7788021s, since last update.
+Checked up to board 468000, took 118.2494431s, since last update.
+Solvable board found [seed,(x,y)]: 468145,(0,0)
+Checked up to board 470000, took 119.010922s, since last update.
+Checked up to board 472000, took 111.2585125s, since last update.
+Checked up to board 474000, took 117.3307515s, since last update.
+Checked up to board 476000, took 115.1227382s, since last update.
+Checked up to board 478000, took 113.4257053s, since last update.
+Checked up to board 480000, took 116.0134925s, since last update.
+Checked up to board 482000, took 118.8561613s, since last update.
+Solvable board found [seed,(x,y)]: 482196,(0,8)
+Checked up to board 484000, took 118.0231968s, since last update.
+Checked up to board 486000, took 114.3368381s, since last update.
+Checked up to board 488000, took 113.3836845s, since last update.
+Checked up to board 490000, took 112.9802917s, since last update.
+Checked up to board 492000, took 115.319456s, since last update.
+Checked up to board 494000, took 117.0010794s, since last update.
+Checked up to board 496000, took 112.7082991s, since last update.
+Checked up to board 498000, took 113.482783s, since last update.
+Checked up to board 500000, took 110.5212339s, since last update.
+Checked up to board 502000, took 109.3618014s, since last update.
+Checked up to board 504000, took 109.7639827s, since last update.
+Checked up to board 506000, took 109.5879674s, since last update.
+Solvable board found [seed,(x,y)]: 506618,(0,6)
+Solvable board found [seed,(x,y)]: 506868,(0,0)
+Checked up to board 508000, took 117.7501757s, since last update.
+Solvable board found [seed,(x,y)]: 509484,(0,2)
+Checked up to board 510000, took 112.4771253s, since last update.
+Checked up to board 512000, took 116.6823034s, since last update.
+Solvable board found [seed,(x,y)]: 512439,(0,0)
+Checked up to board 514000, took 114.9808228s, since last update.
+Checked up to board 516000, took 115.7637531s, since last update.
+Checked up to board 518000, took 113.8244997s, since last update.
+Checked up to board 520000, took 114.4058749s, since last update.
+Solvable board found [seed,(x,y)]: 521041,(0,0)
+Checked up to board 522000, took 115.5172113s, since last update.
+Checked up to board 524000, took 115.7940719s, since last update.
+Checked up to board 526000, took 115.3126444s, since last update.
+Checked up to board 528000, took 116.602154s, since last update.
+Checked up to board 530000, took 116.2111672s, since last update.
+Checked up to board 532000, took 121.7465105s, since last update.
+Solvable board found [seed,(x,y)]: 533501,(0,2)
+Checked up to board 534000, took 116.9130427s, since last update.
+Checked up to board 536000, took 116.1201846s, since last update.
+Checked up to board 538000, took 115.5480073s, since last update.
+Checked up to board 540000, took 117.4601589s, since last update.
+Checked up to board 542000, took 112.004435s, since last update.
+Checked up to board 544000, took 117.1559593s, since last update.
+Solvable board found [seed,(x,y)]: 544380,(0,8)
+Checked up to board 546000, took 112.8679375s, since last update.
+Checked up to board 548000, took 115.0621418s, since last update.
