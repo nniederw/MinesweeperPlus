@@ -2,19 +2,9 @@
 {
     public class SmarterPermutationBuilderBoardSolver : BaseBoardSolver
     {
-        private uint BreakEarlyLogicChain = uint.MaxValue;
-        private uint MaxMergablePermutationCount = uint.MaxValue;
+        private Dictionary<(int x, int y), MineRegionPermutationNode> RegionsDictionary = new Dictionary<(int x, int y), MineRegionPermutationNode>();
         public SmarterPermutationBuilderBoardSolver() : base() { }
         public SmarterPermutationBuilderBoardSolver(IBoard board, bool verboseLogging = false) : base(board, verboseLogging) { }
-        //public override IBoardSolver Construct(IBoard board, bool verboseLogging = false) => new SmarterPermutationBuilderBoardSolver(board, verboseLogging);
-        public void SetBreakEarlyLogicChain(uint value)
-        {
-            BreakEarlyLogicChain = value;
-        }
-        public void SetMaxMergablePermutationCount(uint value)
-        {
-            MaxMergablePermutationCount = value;
-        }
         protected override IEnumerable<Func<bool>> PhaseSequence()
         {
             yield return TestPS1;
@@ -26,7 +16,6 @@
         {
             return new MineRegionPermutationNode(MineRegionPermutationFromNumber(pos), pos.AsSingleEnumerable(), ConnectedActiveNonMineNumbers(pos));
         }
-        private Dictionary<(int x, int y), MineRegionPermutationNode> RegionsDictionary = new Dictionary<(int x, int y), MineRegionPermutationNode>();
         private bool IsBuiltRegion((int x, int y) pos) => RegionsDictionary.ContainsKey(pos);
         private void UseInfo(IEnumerable<((int x, int y) pos, bool mine)> infos)
         {
@@ -44,18 +33,10 @@
         }
         private MineRegionPermutationNode MergeRegions(MineRegionPermutationNode mreg1, MineRegionPermutationNode mreg2)
         {
-            if (mreg1.MineRegionPermutation.SquaresInPermutation.Intersect(mreg2.MineRegionPermutation.SquaresInPermutation).Count() == 1)
-            {
-                // throw new Exception($"WTF u doin?");
-            }
             var merged = mreg1.MergeWith(mreg2);
             foreach (var pos in mreg1.NumbersInLogic.Union(mreg2.NumbersInLogic))
             {
                 RegionsDictionary[pos] = merged;
-            }
-            if (merged.ConnectedNodes.Any(i => !ActiveNumbers.Contains(i.pos)))
-            {
-
             }
             return merged;
         }
@@ -89,7 +70,6 @@
                 RegionsDictionary.Add(pos, mrpn);
                 foreach (var edge in mrpn.ConnectedNodes.Where(i => IsBuiltRegion(i.pos)))
                 {
-                    //break;
                     if (edge.connectedSquares.Count >= 2)
                     {
                         var other = RegionsDictionary[edge.pos];
@@ -170,6 +150,11 @@
                 }
                 activeRegions.RemoveRange(toRemove);
                 activeRegions.AddRange(toAdd);
+            }
+            //todo: consider loops of A - B - C, {AB,BC,AC} each sharing one square
+            if (activeRegions.Count(i => i.ConnectedNodes.Count >= 2) >= 3)
+            {
+                Console.WriteLine($"Current execution of {nameof(SmarterPermutationBuilderBoardSolver)} might still be solvable, even though it will return false");
             }
             return false;
         }

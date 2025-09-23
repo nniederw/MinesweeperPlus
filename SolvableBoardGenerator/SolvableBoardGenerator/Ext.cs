@@ -150,6 +150,14 @@ public static class Ext
             collection.Remove(item);
         }
     }
+    public static Queue<T> EnqueueRange<T>(this Queue<T> queue, IEnumerable<T> items)
+    {
+        foreach (var item in items)
+        {
+            queue.Enqueue(item);
+        }
+        return queue;
+    }
     public static IEnumerable<T> ExceptT<T>(this IEnumerable<T> elements, T value)
     {
         foreach (var element in elements)

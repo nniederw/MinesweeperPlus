@@ -163,7 +163,7 @@ for (int i = 0; i < 0; i++)
 timeDifference = TimeSpan.Zero;
 firstTime = true;
 bool switchEvenOdd = false;
-for (int i = 0; i < 0; i++)
+for (int i = 0; i < 1000; i++)
 {
     Board b = BoardGenerator.GetRandomSeededBoard(BoardType.Expert, i);
     //Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(100, 100, 2100), i);
