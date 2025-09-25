@@ -334,7 +334,7 @@
             if (restGroups.Count == 1)
             {
                 var node = restGroups.Single();
-                var newReg = RestrictMineCountTo(node.mrpn, validRestCount);
+                var newReg = RestrictMineCountToMax(node.mrpn, validRestCount);
                 return TryGettingInformation(newReg);
             }
             // if (VerboseLogging)
@@ -406,9 +406,9 @@
         {
             if (cemrp.MinMineCount > mineCout || mineCout > cemrp.MaxMineCount)
             {
-                throw new Exception($"Called {nameof(RestrictMineCountTo)} with invalid mine count: {mineCout}");
+                throw new Exception($"Called {nameof(RestrictMineCountToMax)} with invalid mine count: {mineCout}");
             }
-            var validPermutations = cemrp.AllPermutations().Where(i => i.MineCount == mineCout).Select(i => (i.Permutation, i.MineCount));
+            var validPermutations = cemrp.AllPermutations().Where(i => i.MineCount <= mineCout).Select(i => (i.Permutation, i.MineCount));
             var indexlut = cemrp.AllPermutations().First().IndexLookupTable;
             return new CountedEfficientMineRegionPermutation(validPermutations, indexlut, cemrp.VerboseLogging);
         }
