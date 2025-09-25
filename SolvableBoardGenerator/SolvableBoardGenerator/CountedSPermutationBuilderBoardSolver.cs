@@ -1,4 +1,6 @@
-﻿namespace Minesweeper
+﻿using System.Collections;
+
+namespace Minesweeper
 {
     public class CountedSPermutationBuilderBoardSolver : BaseBoardSolver
     {
@@ -331,17 +333,61 @@
             {
                 return false; //todo check if this right, should have all case covered where this can give information.
             }
-            if (restGroups.Count == 1)
+            int specialNode = -1;
+            if (FloatingSquares.Any())
             {
-                var node = restGroups.Single();
-                var newReg = RestrictMineCountToMax(node.mrpn, validRestCount);
-                return TryGettingInformation(newReg);
+                var emptylist = new List<(BitArray, uint)>();
+                var dict = new Dictionary<(int x, int y), int>(FloatingSquares.Select(i => KeyValuePair.Create(i, -1)));
+                var simulatedNode = new CountedEfficientMineRegionPermutation(emptylist, dict, 0, FloatingSquaresCount);
+                specialNode = restGroups.Count;
+                restGroups.Add((0, FloatingSquaresCount, simulatedNode));
             }
-            // if (VerboseLogging)
+            int ivalidRestCount = (int)validRestCount;
+            bool changedSomething = true;
+            while (changedSomething)
             {
-                Console.WriteLine("aw shit, mine count is really complicated, stopping here.");
+                changedSomething = false;
+                long sumOfMinBound = restGroups.Sum(i => i.minMineCount);
+                long sumOfMaxBound = restGroups.Sum(i => i.maxMineCount);
+                for (int i = 0; i < restGroups.Count; i++)
+                {
+                    var node = restGroups[i];
+                    uint minbound = (uint)Math.Max(node.minMineCount, ivalidRestCount - sumOfMaxBound + node.maxMineCount);
+                    uint maxbound = (uint)Math.Min(node.maxMineCount, ivalidRestCount - sumOfMinBound + node.minMineCount);
+                    if (i == specialNode)
+                    {
+                        if ((node.minMineCount, node.maxMineCount) != (minbound, maxbound))
+                        {
+                            node.minMineCount = minbound;
+                            node.maxMineCount = maxbound;
+                            if (maxbound == 0)
+                            {
+                                FloatingSquares.ForEach(i => ClickSquare(i));
+                                return true;
+                            }
+                            if (minbound == FloatingSquaresCount)
+                            {
+                                FloatingSquares.ForEach(i => SetMine(i));
+                                //don't return yet, as this can't give new information
+                            }
+                            changedSomething = true;
+                            restGroups[i] = (minbound, maxbound, node.mrpn);
+                        }
+                        continue;
+                    }
+                    var newNode = RestrictMineCountToBounds(node.mrpn, minbound, maxbound);
+                    if (newNode != node.mrpn)
+                    {
+                        if (TryGettingInformation(newNode))
+                        {
+                            return true;
+                        }
+                        restGroups[i] = (newNode.MinMineCount, newNode.MaxMineCount, newNode);
+                        changedSomething = true;
+                        continue;
+                    }
+                }
             }
-            //todo
             return false;
         }
         private (uint trivialMinMineCount, uint trivialMaxMineCount) CalculateTrivialCounts(List<MineRegionPermutationNode> acyclicGroup)
@@ -409,6 +455,13 @@
                 throw new Exception($"Called {nameof(RestrictMineCountToMax)} with invalid mine count: {mineCout}");
             }
             var validPermutations = cemrp.AllPermutations().Where(i => i.MineCount <= mineCout).Select(i => (i.Permutation, i.MineCount));
+            var indexlut = cemrp.AllPermutations().First().IndexLookupTable;
+            return new CountedEfficientMineRegionPermutation(validPermutations, indexlut, cemrp.VerboseLogging);
+        }
+        private CountedEfficientMineRegionPermutation RestrictMineCountToBounds(CountedEfficientMineRegionPermutation cemrp, uint minMineCount, uint maxMineCount)
+        {
+            if (cemrp.MinMineCount >= minMineCount && cemrp.MaxMineCount <= maxMineCount) { return cemrp; }
+            var validPermutations = cemrp.AllPermutations().Where(i => minMineCount <= i.MineCount && i.MineCount <= maxMineCount).Select(i => (i.Permutation, i.MineCount));
             var indexlut = cemrp.AllPermutations().First().IndexLookupTable;
             return new CountedEfficientMineRegionPermutation(validPermutations, indexlut, cemrp.VerboseLogging);
         }

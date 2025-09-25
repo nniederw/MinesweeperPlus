@@ -163,7 +163,7 @@ for (int i = 0; i < 0; i++)
 timeDifference = TimeSpan.Zero;
 firstTime = true;
 bool switchEvenOdd = false;
-for (int i = 0; i < 100000; i++)
+for (int i = 0; i < 100000; i++) //cases where CountedSPermutationBuilderBoardSolver is incomplete: 5983, 6459, 8311, 11118
 {
     Board b = BoardGenerator.GetRandomSeededBoard(BoardType.Beginner, i);
     //Board b = BoardGenerator.GetRandomSeededBoard(BoardType.Expert, i);
@@ -174,7 +174,7 @@ for (int i = 0; i < 100000; i++)
     TimeSpan t;
     if (!switchEvenOdd || i % 2 == 0)
     {
-        t = BoardChecker.SolverComparer<CountedSPermutationBuilderBoardSolver, EdgeBruteForceBoardSolver>(b, startPos, true, false);
+        t = BoardChecker.SolverComparer<CountedSPermutationBuilderBoardSolver, EdgeBruteForceBoardSolver>(b, startPos, false, false);
     }
     else
     {
