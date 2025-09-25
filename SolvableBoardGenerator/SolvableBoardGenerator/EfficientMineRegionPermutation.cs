@@ -4,7 +4,7 @@ namespace Minesweeper
     public abstract class EfficientMineRegionPermutationBase
     {
         protected IReadOnlyDictionary<(int x, int y), int> IndexLookupTable = new Dictionary<(int x, int y), int>();
-        protected bool VerboseLogging = false;
+        public bool VerboseLogging { get; protected set; }
         protected const uint StartOfProgressUpdates = 10000;
         protected const uint ProgressUpdateEvery = 10000;
         public IEnumerable<(int x, int y)> SquaresInPermutation => IndexLookupTable.Keys;

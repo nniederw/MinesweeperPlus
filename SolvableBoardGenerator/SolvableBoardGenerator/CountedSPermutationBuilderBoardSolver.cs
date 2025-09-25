@@ -1,14 +1,19 @@
 ﻿namespace Minesweeper
 {
-    public class SmarterPermutationBuilderBoardSolver : BaseBoardSolver
+    public class CountedSPermutationBuilderBoardSolver : BaseBoardSolver
     {
         private Dictionary<(int x, int y), MineRegionPermutationNode> RegionsDictionary = new Dictionary<(int x, int y), MineRegionPermutationNode>();
-        public SmarterPermutationBuilderBoardSolver() : base() { }
-        public SmarterPermutationBuilderBoardSolver(IBoard board, bool verboseLogging = false) : base(board, verboseLogging) { }
+        private HashSet<MineRegionPermutationNode> LastActivePermutationNodes = new HashSet<MineRegionPermutationNode>();
+        private List<List<MineRegionPermutationNode>> LastActiveNodesGroups = new List<List<MineRegionPermutationNode>>();
+        public CountedSPermutationBuilderBoardSolver() : base() { }
+        public CountedSPermutationBuilderBoardSolver(IBoard board, bool verboseLogging = false) : base(board, verboseLogging) { }
         protected override IEnumerable<Func<bool>> PhaseSequence()
         {
             yield return TestPS1;
+            LastActiveNodesGroups.Clear();
+            LastActivePermutationNodes.Clear();
             yield return PermutationBuildingAlgorithm;
+            yield return MineCountTester;
         }
         private IEnumerable<MineRegionPermutationNode> GetRegionsFromActiveNumbers()
             => ActiveNumbers.Select(i => MineRegionPNodeFromNumber(i));
@@ -58,9 +63,10 @@
             }
             return mrpn;
         }
-        private bool TryGettingInformation(MineRegionPermutationNode mrpn)
+        private bool TryGettingInformation(MineRegionPermutationNode mrpn) => TryGettingInformation(mrpn.MineRegionPermutation);
+        private bool TryGettingInformation(CountedEfficientMineRegionPermutation mrpn)
         {
-            var infos = mrpn.MineRegionPermutation.GetInformation();
+            var infos = mrpn.GetInformation();
             if (infos.Any())
             {
                 UseInfo(infos);
@@ -73,19 +79,9 @@
             }
             return false;
         }
-        private bool MergeIfAlreadyContainedInDict(MineRegionPermutationNode mrpn)
+        private IEnumerable<MineRegionPermutationNode> OutEdges(MineRegionPermutationNode mrpn)
         {
-            var nIL = mrpn.NumbersInLogic;
-            foreach (var other in mrpn.ConnectedNodes.Select(i => i.pos).Where(RegionsDictionary.ContainsKey).Select(i => RegionsDictionary[i]))
-            {
-                var otherNIL = other.NumbersInLogic;
-                if (otherNIL.Count == nIL.Count && otherNIL.Intersect(nIL).Count() == nIL.Count)
-                {
-                    MergeRegions(mrpn, other);
-                    return true;
-                }
-            }
-            return false;
+            return mrpn.ConnectedNodes.Select(i => RegionsDictionary[i.pos]).Distinct();
         }
         private bool PermutationBuildingAlgorithm()
         {
@@ -98,10 +94,6 @@
             RegionsDictionary.EnsureCapacity(ActiveNumbers.Count);
             foreach (var mrpn in GetRegionsFromActiveNumbers())
             {
-                if (MergeIfAlreadyContainedInDict(mrpn))
-                {
-                    continue;
-                }
                 var pos = mrpn.NumbersInLogic.Single(); ; //can only contain 1 number
                 RegionsDictionary.Add(pos, mrpn);
                 foreach (var edge in mrpn.ConnectedNodes.Where(i => IsBuiltRegion(i.pos)))
@@ -119,6 +111,7 @@
                 }
             }
             var activeRegions = RegionsDictionary.Values.ToHashSet();
+            var inactiveRegions = new HashSet<MineRegionPermutationNode>();
             bool mergedSomething = true;
             while (mergedSomething)
             {
@@ -130,6 +123,7 @@
                     if (!mrpn.ConnectedNodes.Any() || mrpn.ConnectedNodes.Count == 1 && mrpn.ConnectedNodes.Single().connectedSquares.Count <= 1)
                     {
                         activeRegions.Remove(mrpn);
+                        inactiveRegions.Add(mrpn);
                         continue;
                     }
                     var mergableInd = mrpn.ConnectedNodes.FindIndex(i => i.connectedSquares.Count >= 2);
@@ -187,11 +181,13 @@
                 activeRegions.RemoveRange(toRemove);
                 activeRegions.AddRange(toAdd);
             }
+            LastActivePermutationNodes = activeRegions.Union(inactiveRegions).ToHashSet();
+
             //resolve cycles in logic
             var groups = new List<List<MineRegionPermutationNode>>();
             {
-                var nodes = activeRegions.ToHashSet();
-                foreach (var reg in activeRegions)
+                var nodes = activeRegions.Union(inactiveRegions).ToHashSet();
+                foreach (var reg in activeRegions.Union(inactiveRegions))
                 {
                     if (nodes.Contains(reg))
                     {
@@ -230,24 +226,193 @@
                     {
                         if (VerboseLogging)
                         {
-                            Console.WriteLine($"aw shit, we gotta merge {cycleElements.Count} logics just because they form a cycle.");
+                            Console.WriteLine($"aw shit, we gotta merge {cycleElements.Count} logics just because they form a cycle (potential {cycleElements.Product(i => i.MineRegionPermutation.PermutationCount)} permutations).");
                         }
                         var merged = MergeRegions(cycleElements);
                         if (TryGettingInformation(merged))
                         {
                             return true;
                         }
+                        LastActiveNodesGroups.Add(group.Except(cycleElements).Prepend(merged).ToList());
+                        continue;
+                    }
+                    LastActiveNodesGroups.Add(group);
+                }
+                else
+                {
+                    LastActiveNodesGroups.Add(group);
+                }
+            }
+            /*foreach (var reg in inactiveRegions)
+            {
+                LastActiveNodesGroups.Add(new List<MineRegionPermutationNode>() { reg });
+            }*/
+            return false;
+        }
+        private bool MineCountTester()
+        {
+            var FloatingSquares = Board.AllSquares().Where(i => !IsOpenedSquare(i) && !IsSetMine(i) && !ActiveUnopenedSquares.Contains(i)).ToList();
+            uint FloatingSquaresCount = (uint)FloatingSquares.Count;
+            uint trivialMin = 0; //lower bound of edge minecount
+            uint trivialMax = 0;//upper bound of edge minecount
+            var groups = LastActiveNodesGroups;
+            if (groups.Count == 0)
+            {
+                if (MineCount == 0 && FloatingSquares.Any())
+                {
+                    foreach (var pos in FloatingSquares)
+                    {
+                        ClickSquare(pos);
+                    }
+                    return true;
+                }
+                return false;
+            }
+            foreach (var tbounds in groups.Select(i => CalculateTrivialCounts(i)))
+            {
+                trivialMin += tbounds.trivialMinMineCount;
+                trivialMax += tbounds.trivialMaxMineCount;
+            }
+            if (MineCount > trivialMax)
+            {
+                return false; //trivial Max is an upper bound of edge mines
+            }
+            if (MineCount < trivialMin)
+            {
+                throw new Exception($"{nameof(MineCountTester)} counted a lower bound for edge mines that is higher than the current mine count. Something must truly be off.");
+            }
+            if (MineCount == trivialMin)
+            {
+                if (FloatingSquaresCount > 0)
+                {
+                    foreach (var pos in FloatingSquares)
+                    {
+                        ClickSquare(pos);
+                    }
+                    return true;
+                }
+            }
+            uint minEdgeCount = 0;
+            uint maxEdgeCount = 0;
+            var countedGroups = groups.Select(i => CalculatePreciseCounts(i)).ToList();
+            foreach (var group in countedGroups)
+            {
+                minEdgeCount += group.minMineCount;
+                maxEdgeCount += group.maxMineCount;
+            }
+            if (MineCount > maxEdgeCount)
+            {
+                return false;
+            }
+            if (MineCount < minEdgeCount)
+            {
+                throw new Exception($"{nameof(MineCountTester)} counted a lower bound for edge mines that is higher than the current mine count. Something must truly be off.");
+            }
+            if (MineCount == minEdgeCount && FloatingSquares.Any())
+            {
+                foreach (var pos in FloatingSquares)
+                {
+                    ClickSquare(pos);
+                }
+                return true;
+            }
+            var validRestCount = MineCount;
+            var restGroups = new List<(uint minMineCount, uint maxMineCount, CountedEfficientMineRegionPermutation mrpn)>();
+            foreach (var group in countedGroups)
+            {
+                if (group.minMineCount == group.maxMineCount)
+                {
+                    validRestCount -= group.minMineCount;
+                    continue;
+                }
+                restGroups.Add(group);
+            }
+            if (!restGroups.Any())
+            {
+                return false; //todo check if this right, should have all case covered where this can give information.
+            }
+            if (restGroups.Count == 1)
+            {
+                var node = restGroups.Single();
+                var newReg = RestrictMineCountTo(node.mrpn, validRestCount);
+                return TryGettingInformation(newReg);
+            }
+            // if (VerboseLogging)
+            {
+                Console.WriteLine("aw shit, mine count is really complicated, stopping here.");
+            }
+            //todo
+            return false;
+        }
+        private (uint trivialMinMineCount, uint trivialMaxMineCount) CalculateTrivialCounts(List<MineRegionPermutationNode> acyclicGroup)
+        {
+            if (acyclicGroup.Count == 1)
+            {
+                var n = acyclicGroup.Single().MineRegionPermutation;
+                return (n.MinMineCount, n.MaxMineCount);
+            }
+            uint trivialMinMineCount, trivialMaxMineCount;
+            trivialMinMineCount = 0;
+            trivialMaxMineCount = 0;
+            HashSet<MineRegionPermutationNode> processedNodes = new HashSet<MineRegionPermutationNode>();
+            foreach (var node in GetTreeFromAcyclicGraph(acyclicGroup.First()))
+            {
+                processedNodes.Add(node);
+                HashSet<(int x, int y)> alreadyProcessedSquares = new HashSet<(int x, int y)>();
+                var edges = OutEdges(node).Where(i => processedNodes.Contains(i)).ToList();
+                foreach (var edge in edges)
+                {
+                    var squares = edge.MineRegionPermutation.SquaresInPermutation.Intersect(node.MineRegionPermutation.SquaresInPermutation);
+                    alreadyProcessedSquares.AddRange(squares);
+                }
+                int sharedSquares = alreadyProcessedSquares.Count;
+                trivialMinMineCount += (uint)Math.Max(0, node.MineRegionPermutation.MinMineCount - sharedSquares);
+                trivialMaxMineCount += (node.MineRegionPermutation.MaxMineCount + (uint)sharedSquares);
+            }
+            return (trivialMinMineCount, trivialMaxMineCount);
+        }
+        private (uint minMineCount, uint maxMineCount, CountedEfficientMineRegionPermutation mrpn) CalculatePreciseCounts(List<MineRegionPermutationNode> acyclicGroup)
+        {
+            if (acyclicGroup.Count == 1)
+            {
+                var n = acyclicGroup.Single().MineRegionPermutation;
+                return (n.MinMineCount, n.MaxMineCount, n);
+            }
+            var merged = MergeRegions(acyclicGroup);
+            //todo optimize
+            return (merged.MineRegionPermutation.MinMineCount, merged.MineRegionPermutation.MaxMineCount, merged.MineRegionPermutation);
+        }
+        private IEnumerable<MineRegionPermutationNode> GetTreeFromAcyclicGraph(MineRegionPermutationNode start, HashSet<MineRegionPermutationNode> visitedRegs = null)
+        {
+            if (visitedRegs == null)
+            {
+                visitedRegs = new HashSet<MineRegionPermutationNode>();
+            }
+            visitedRegs.Add(start);
+            yield return start;
+            foreach (var edge in start.ConnectedNodes)
+            {
+                var reg = RegionsDictionary[edge.pos];
+                if (!visitedRegs.Contains(reg))
+                {
+                    foreach (var result in GetTreeFromAcyclicGraph(reg, visitedRegs))
+                    {
+                        yield return result;
                     }
                 }
             }
-            return false;
         }
-
-        private IEnumerable<MineRegionPermutationNode> OutEdges(MineRegionPermutationNode mrpn)
+        private CountedEfficientMineRegionPermutation RestrictMineCountToMax(CountedEfficientMineRegionPermutation cemrp, uint mineCout)
         {
-            return mrpn.ConnectedNodes.Select(i => RegionsDictionary[i.pos]).Distinct();
+            if (cemrp.MinMineCount > mineCout || mineCout > cemrp.MaxMineCount)
+            {
+                throw new Exception($"Called {nameof(RestrictMineCountTo)} with invalid mine count: {mineCout}");
+            }
+            var validPermutations = cemrp.AllPermutations().Where(i => i.MineCount == mineCout).Select(i => (i.Permutation, i.MineCount));
+            var indexlut = cemrp.AllPermutations().First().IndexLookupTable;
+            return new CountedEfficientMineRegionPermutation(validPermutations, indexlut, cemrp.VerboseLogging);
         }
-        private EfficientMineRegionPermutation MineRegionPermutationFromNumber((int x, int y) pos)
+        private CountedEfficientMineRegionPermutation MineRegionPermutationFromNumber((int x, int y) pos)
         {
             if (DiscoveredNumbers[pos.x, pos.y] == UndiscoveredNumber)
             {
@@ -256,19 +421,19 @@
             var totalNeighbors = Board.GetNeighbors(pos).ToList();
             uint mines = (uint)DiscoveredNumbers[pos.x, pos.y] - (uint)totalNeighbors.Count(i => IsSetMine(i));
             var neighbors = totalNeighbors.Where(i => !IsSetMine(i) && !IsOpenedSquare(i)).ToList();
-            return new EfficientMineRegionPermutation(mines, neighbors, VerboseLogging);
+            return new CountedEfficientMineRegionPermutation(mines, neighbors, VerboseLogging);
         }
         private class MineRegionPermutationNode
         {
             public List<((int x, int y) pos, IReadOnlyList<(int x, int y)> connectedSquares)> ConnectedNodes = new List<((int x, int y) pos, IReadOnlyList<(int x, int y)> connectivity)>();
             public IReadOnlyCollection<(int x, int y)> NumbersInLogic = new List<(int x, int y)>();
-            public EfficientMineRegionPermutation MineRegionPermutation;
-            public MineRegionPermutationNode(EfficientMineRegionPermutation mineRegionPermutation, IEnumerable<(int x, int y)> numbersInLogic)
+            public CountedEfficientMineRegionPermutation MineRegionPermutation;
+            public MineRegionPermutationNode(CountedEfficientMineRegionPermutation mineRegionPermutation, IEnumerable<(int x, int y)> numbersInLogic)
             {
                 MineRegionPermutation = mineRegionPermutation;
                 NumbersInLogic = numbersInLogic.ToList();
             }
-            public MineRegionPermutationNode(EfficientMineRegionPermutation mineRegionPermutation, IEnumerable<(int x, int y)> numbersInLogic, IEnumerable<((int x, int y) pos, IReadOnlyList<(int x, int y)> connectedSquares)> connectedNodes)
+            public MineRegionPermutationNode(CountedEfficientMineRegionPermutation mineRegionPermutation, IEnumerable<(int x, int y)> numbersInLogic, IEnumerable<((int x, int y) pos, IReadOnlyList<(int x, int y)> connectedSquares)> connectedNodes)
             {
                 MineRegionPermutation = mineRegionPermutation;
                 NumbersInLogic = numbersInLogic.ToList();

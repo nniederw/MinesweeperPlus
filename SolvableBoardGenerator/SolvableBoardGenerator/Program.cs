@@ -163,20 +163,22 @@ for (int i = 0; i < 0; i++)
 timeDifference = TimeSpan.Zero;
 firstTime = true;
 bool switchEvenOdd = false;
-for (int i = 0; i < 1000; i++)
+for (int i = 0; i < 100000; i++)
 {
-    Board b = BoardGenerator.GetRandomSeededBoard(BoardType.Expert, i);
+    Board b = BoardGenerator.GetRandomSeededBoard(BoardType.Beginner, i);
+    //Board b = BoardGenerator.GetRandomSeededBoard(BoardType.Expert, i);
+    Console.Write($"[{i}]");
     //Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(100, 100, 2100), i);
     //Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(200, 200, 5000), i);
     var startPos = BoardChecker.FindFirstZero(b);
     TimeSpan t;
     if (!switchEvenOdd || i % 2 == 0)
     {
-        t = BoardChecker.SolverComparer<EfficientSmartPermutationBuilderBoardSolver, SmarterPermutationBuilderBoardSolver>(b, startPos);
+        t = BoardChecker.SolverComparer<CountedSPermutationBuilderBoardSolver, EdgeBruteForceBoardSolver>(b, startPos, true, false);
     }
     else
     {
-        t = BoardChecker.SolverComparer<SmarterPermutationBuilderBoardSolver, EfficientSmartPermutationBuilderBoardSolver>(b, startPos);
+        t = BoardChecker.SolverComparer<SmarterPermutationBuilderBoardSolver, CountedSPermutationBuilderBoardSolver>(b, startPos);
         t = t * -1.0;
     }
     if (firstTime)
@@ -185,14 +187,14 @@ for (int i = 0; i < 1000; i++)
         continue;
     }
     timeDifference += t;
-    if (i % 10 == 0)
+    if (i % 1000 == 0)
     {
         Console.WriteLine($"Current time saving of SmarterPermutationBuilderBoardSolver: {timeDifference.TotalMilliseconds}ms (positive = SmarterPermutationBuilderBoardSolver is faster)");
     }
 }
 var lastTime = DateTime.Now;
 const uint update = 2000;
-for (int i = 0; i < 10000000; i++)
+for (int i = 0; i < 0; i++)
 {
     //Board b = BoardGenerator.GetRandomSeededBoard(BoardType.Expert, i);
     Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(100, 100, 2100), i);

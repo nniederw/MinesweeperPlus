@@ -136,6 +136,15 @@ public static class Ext
     {
         yield return element;
     }
+    public static long Product<T>(this IEnumerable<T> items, Func<T, long> getValue)
+    {
+        long result = 1;
+        foreach (var item in items)
+        {
+            result *= getValue(item);
+        }
+        return result;
+    }
     public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> items)
     {
         foreach (var item in items)

@@ -30,6 +30,7 @@ namespace Minesweeper
             Board = Minesweeper.Board.GetEmptyBoard();
             DiscoveredMines = new bool[0, 0];
             DiscoveredNumbers = new sbyte[0, 0];
+            ResetSolver();
         }
         public BaseBoardSolver(IBoard board, bool verboseLogging = false)
         {
@@ -60,32 +61,10 @@ namespace Minesweeper
         {
             VerboseLogging = verboseLogging;
         }
-        //public abstract IBoardSolver Construct(IBoard board, bool verboseLogging = false);
         public virtual SolvabilityClass GetSolvabilityClass => SolvabilityClass.Unknown;
-        /* private static void TestConstruct<T>(Board board) where T : BaseBoardSolver
-         {
-             T solver = (T)Activator.CreateInstance(typeof(T), board, false)!; // create a test instance
-             IBoardSolver constructed = solver.Construct(board, false);
-             if (constructed == null)
-             {
-                 throw new InvalidOperationException($"Construct() did not return the same type! Expected {typeof(T)}, got null. You probably forgot to override the Construct function in {typeof(T)}, or let it return null.");
-             }
-             if (constructed.GetType() != typeof(T))
-             {
-                 throw new InvalidOperationException($"Construct() did not return the same type! Expected {typeof(T)}, got {constructed.GetType()}. You probably forgot to override the Construct function in {typeof(T)} ");
-             }
-         }*/
-        /*private void RunDynamicTestConstruct(IBoard board)
-        {
-            Type myType = this.GetType(); // runtime type of the current instance
-            var method = typeof(BaseBoardSolver).GetMethod(nameof(TestConstruct), BindingFlags.NonPublic | BindingFlags.Static)!; // static TestConstruct<T>
-            var generic = method.MakeGenericMethod(myType);
-            generic.Invoke(null, new object[] { board });
-        }*/
         public virtual bool IsSolvable((int x, int y) startPos) => IsSolvable(startPos.x, startPos.y);
         public virtual bool IsSolvable(int startX, int startY)
         {
-            //RunDynamicTestConstruct(Board);
             ResetSolver();
             try
             {
@@ -151,6 +130,8 @@ namespace Minesweeper
                     DiscoveredNumbers[x, y] = UndiscoveredNumber;
                 }
             }
+            ActiveNumbers = new HashSet<(int x, int y)>();
+            ActiveUnopenedSquares = new HashSet<(int x, int y)>();
             foreach (var pos in Board.GetStartClears())
             {
                 ClickSquare(pos);
@@ -203,6 +184,7 @@ namespace Minesweeper
             }
             DiscoveredNumbers[x, y] = Board.ClickOnSquare(x, y);
             ActiveNumbers.Add((x, y));
+            ActiveUnopenedSquares.Remove((x, y));
             Board.GetNeighbors(x, y).Where(i => !IsOpenedSquare(i) && !IsSetMine(i)).Foreach(i => ActiveUnopenedSquares.Add(i));
             SquaresCleared++;
         }
@@ -260,6 +242,37 @@ namespace Minesweeper
                     yield return number;
                 }
             }
+        }
+        protected IEnumerable<T> GetCycleElements<T>(List<(T mrpn, List<T> edges)> group)
+        {
+            var graph = new Dictionary<T, HashSet<T>>();
+            var deg1nodes = new Queue<T>();
+            foreach (var node in group)
+            {
+                graph[node.mrpn] = node.edges.ToHashSet();
+                if (node.edges.Count == 1)
+                {
+                    deg1nodes.Enqueue(node.mrpn);
+                }
+            }
+            while (deg1nodes.Any())
+            {
+                var element = deg1nodes.Dequeue();
+                if (!graph.ContainsKey(element))
+                {
+                    continue;
+                }
+                foreach (var edge in graph[element].Where(i => graph.ContainsKey(i)))
+                {
+                    graph[edge].Remove(element);
+                    if (graph[edge].Count == 1)
+                    {
+                        deg1nodes.Enqueue(edge);
+                    }
+                }
+                graph.Remove(element);
+            }
+            return graph.Keys;
         }
         public void PrintCurrentStateBoard()
         {

@@ -172,6 +172,12 @@
             {
                 Ext.ConsoleWriteColor($"{typeof(Solver1).Name} has solvability {solvability1}, but {typeof(Solver2).Name} has solvability {solvability2}", ConsoleColor.Red);
                 Console.WriteLine();
+                Console.WriteLine($"State of solver {typeof(Solver1).Name}");
+                solver1.PrintCurrentStateBoard();
+                Console.WriteLine();
+                Console.WriteLine($"State of solver {typeof(Solver2).Name}");
+                solver2.PrintCurrentStateBoard();
+                Console.WriteLine();
             }
             return timeSolver1 - timeSolver2;
         }
