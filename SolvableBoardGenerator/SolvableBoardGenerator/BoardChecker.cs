@@ -149,8 +149,51 @@
             }
             return timeSolver1 - timeSolver2;
         }
+        public static void CompareSolverTimes<Solver1, Solver2>(BoardType boardType, int printTimesEvery = 1000, bool printOnError = true, int iterations = int.MaxValue)
+            where Solver1 : IBoardSolver, new() where Solver2 : IBoardSolver, new()
+        {
+            var timeDifference = TimeSpan.Zero;
+
+            int skipUntil = 5;
+            for (int i = 0; i < iterations; i++)
+            {
+                Board b = BoardGenerator.GetRandomSeededBoard(boardType, i);
+                using (StringWriter sw = new StringWriter())
+                {
+                    var originalOut = Console.Out;
+                    Console.SetOut(sw);
+                    var startPos = FindFirstZero(b);
+                    TimeSpan t;
+                    if (i % 2 == 0)
+                    {
+                        t = SolverComparer<Solver1, Solver2>(b, startPos, true, false);
+                    }
+                    else
+                    {
+                        t = SolverComparer<Solver2, Solver1>(b, startPos, true, false);
+                        t = t * -1.0;
+                    }
+                    Console.SetOut(originalOut);
+                    if (i < skipUntil)
+                    {
+                        continue;
+                    }
+                    timeDifference += t;
+                    if (printOnError && sw.ToString() != "")
+                    {
+                        Console.WriteLine($"There seems to be a difference of solvability in the board of seed {i}:");
+                        SolverComparer<Solver1, Solver2>(b, startPos, true, false);
+                    }
+                }
+                if (i % printTimesEvery == 0)
+                {
+                    Console.WriteLine($"Current time saving of {typeof(Solver2).Name}: {timeDifference.TotalMilliseconds}ms (positive = {typeof(Solver2).Name} is faster than {typeof(Solver1).Name} )");
+                }
+            }
+        }
         /// <returns>Time of solver 1 - time of solver 2</returns>
-        public static TimeSpan SolverComparer<Solver1, Solver2>(Board b, (int x, int y) startPos, bool withoutPrint = false, bool verboseLogging = false) where Solver1 : IBoardSolver, new() where Solver2 : IBoardSolver, new()
+        public static TimeSpan SolverComparer<Solver1, Solver2>(Board b, (int x, int y) startPos, bool withoutPrint = false, bool verboseLogging = false)
+            where Solver1 : IBoardSolver, new() where Solver2 : IBoardSolver, new()
         {
             Solver1 solver1 = new Solver1();
             solver1.SetVerboseLogging(verboseLogging);

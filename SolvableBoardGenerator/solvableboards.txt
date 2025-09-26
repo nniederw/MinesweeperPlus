@@ -358,3 +358,32 @@ Checked up to board 544000, took 117.1559593s, since last update.
 Solvable board found [seed,(x,y)]: 544380,(0,8)
 Checked up to board 546000, took 112.8679375s, since last update.
 Checked up to board 548000, took 115.0621418s, since last update.
+
+Done with minecount:
+Checked up to board 0, took 0.3710655s, since last update.
+Checked up to board 100, took 6.6037746s, since last update.
+Solvable board found [seed,(x,y)]: 121,(0,0)
+Checked up to board 200, took 7.4124541s, since last update.
+Took 199.80842s for board 224
+Checked up to board 300, took 216.9828318s, since last update.
+Checked up to board 400, took 18.7009369s, since last update.
+Took 1.3832087s for board 466
+Checked up to board 500, took 19.9244532s, since last update.
+Checked up to board 600, took 15.5511207s, since last update.
+Checked up to board 700, took 15.216429s, since last update.
+Took 1.0546119s for board 759
+Checked up to board 800, took 15.3799827s, since last update.
+Took 2.1789159s for board 817
+Took 14.5426036s for board 863
+Checked up to board 900, took 35.7720734s, since last update.
+Checked up to board 1000, took 19.0890589s, since last update.
+Checked up to board 1100, took 14.5580078s, since last update.
+Checked up to board 1200, took 21.0015828s, since last update.
+Checked up to board 1300, took 17.6713968s, since last update.
+Checked up to board 1400, took 17.478338s, since last update.
+Checked up to board 1500, took 18.4870513s, since last update.
+Checked up to board 1600, took 8.4435595s, since last update.
+Checked up to board 1700, took 7.6763974s, since last update.
+Checked up to board 1800, took 9.7649114s, since last update.
+Checked up to board 1900, took 7.7550239s, since last update.
+Took 9.698877s for board 1925

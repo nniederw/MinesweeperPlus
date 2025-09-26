@@ -255,8 +255,8 @@ namespace Minesweeper
         {
             var FloatingSquares = Board.AllSquares().Where(i => !IsOpenedSquare(i) && !IsSetMine(i) && !ActiveUnopenedSquares.Contains(i)).ToList();
             uint FloatingSquaresCount = (uint)FloatingSquares.Count;
-            uint trivialMin = 0; //lower bound of edge minecount
-            uint trivialMax = 0;//upper bound of edge minecount
+            uint trivialEdgeMinCount = 0; //lower bound of edge minecount
+            uint trivialEdgeMaxCount = 0;//upper bound of edge minecount
             var groups = LastActiveNodesGroups;
             if (groups.Count == 0)
             {
@@ -272,18 +272,18 @@ namespace Minesweeper
             }
             foreach (var tbounds in groups.Select(i => CalculateTrivialCounts(i)))
             {
-                trivialMin += tbounds.trivialMinMineCount;
-                trivialMax += tbounds.trivialMaxMineCount;
+                trivialEdgeMinCount += tbounds.trivialMinMineCount;
+                trivialEdgeMaxCount += tbounds.trivialMaxMineCount;
             }
-            if (MineCount > trivialMax)
+            if (MineCount > trivialEdgeMaxCount)
             {
                 return false; //trivial Max is an upper bound of edge mines
             }
-            if (MineCount < trivialMin)
+            if (MineCount < trivialEdgeMinCount)
             {
                 throw new Exception($"{nameof(MineCountTester)} counted a lower bound for edge mines that is higher than the current mine count. Something must truly be off.");
             }
-            if (MineCount == trivialMin)
+            if (MineCount == trivialEdgeMinCount)
             {
                 if (FloatingSquaresCount > 0)
                 {
@@ -302,10 +302,10 @@ namespace Minesweeper
                 minEdgeCount += group.minMineCount;
                 maxEdgeCount += group.maxMineCount;
             }
-            if (MineCount > maxEdgeCount)
+            /*if (MineCount > maxEdgeCount)
             {
                 return false;
-            }
+            }*/
             if (MineCount < minEdgeCount)
             {
                 throw new Exception($"{nameof(MineCountTester)} counted a lower bound for edge mines that is higher than the current mine count. Something must truly be off.");
