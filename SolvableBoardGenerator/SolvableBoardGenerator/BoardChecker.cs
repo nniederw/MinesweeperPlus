@@ -2,7 +2,7 @@
 {
     public class BoardChecker
     {
-        public static (int x, int y) FindFirstZero(Board board)
+        public static (int x, int y) FindFirstZero(IBoard board)
         {
             for (int x = 0; x < board.SizeX; x++)
             {
@@ -16,7 +16,7 @@
             }
             return (0, 0);
         }
-        public static bool[,] CheckBoard(Board board, bool printProgress = false)
+        public static bool[,] CheckBoard(IBoard board, bool printProgress = false)
         {
             var sbs = new EdgeBruteForceBoardSolver(board);
             var result = new bool[board.SizeX, board.SizeY];
@@ -34,7 +34,7 @@
             }
             return result;
         }
-        public static bool[,] CheckBoard<BoardSolver>(Board board, bool printProgress = false) where BoardSolver : BaseBoardSolver, new()
+        public static bool[,] CheckBoard<BoardSolver>(IBoard board, bool printProgress = false) where BoardSolver : BaseBoardSolver, new()
         {
             var sbs = new BoardSolver();
             sbs.ChangeBoard(board);
@@ -187,12 +187,12 @@
                 }
                 if (i % printTimesEvery == 0)
                 {
-                    Console.WriteLine($"Current time saving of {typeof(Solver2).Name}: {timeDifference.TotalMilliseconds}ms (positive = {typeof(Solver2).Name} is faster than {typeof(Solver1).Name} )");
+                    Console.WriteLine($"[{i}] Current time saving of {typeof(Solver2).Name}: {timeDifference.TotalMilliseconds}ms (positive = {typeof(Solver2).Name} is faster than {typeof(Solver1).Name})");
                 }
             }
         }
         /// <returns>Time of solver 1 - time of solver 2</returns>
-        public static TimeSpan SolverComparer<Solver1, Solver2>(Board b, (int x, int y) startPos, bool withoutPrint = false, bool verboseLogging = false)
+        public static TimeSpan SolverComparer<Solver1, Solver2>(IBoard b, (int x, int y) startPos, bool withoutPrint = false, bool verboseLogging = false)
             where Solver1 : IBoardSolver, new() where Solver2 : IBoardSolver, new()
         {
             Solver1 solver1 = new Solver1();

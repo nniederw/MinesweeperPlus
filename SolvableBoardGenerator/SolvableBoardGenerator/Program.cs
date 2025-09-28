@@ -160,7 +160,9 @@ for (int i = 0; i < 0; i++)
         Console.WriteLine($"Current time saving of BitArrayBoard: {timeDifference.TotalMilliseconds}ms (positive = BitArrayBoard is faster)");
     }
 }
-//BoardChecker.CompareSolverTimes<EdgeBruteForceBoardSolver, CountedSPermutationBuilderBoardSolver>(BoardType.Beginner,1000);
+//IBoard bb = BoardGenerator.GetRandomSeededBoard(BoardType.Beginner, 1564106);
+//BoardChecker.SolverComparer<EdgeBruteForceBoardSolver, CountedSPermutationBuilderBoardSolver>(bb, BoardChecker.FindFirstZero(bb), true, true);
+BoardChecker.CompareSolverTimes<EdgeBruteForceBoardSolver, CountedSPermutationBuilderBoardSolver>(BoardType.SmallHighDensityTestBoard, 50000);
 //BoardChecker.CompareSolverTimes<SmarterPermutationBuilderBoardSolver, EfficientSmartPermutationBuilderBoardSolver>(BoardType.Expert, 100);
 //BoardChecker.CompareSolverTimes<SmarterPermutationBuilderBoardSolver, CountedSPermutationBuilderBoardSolver>(BoardType.Expert, 100, false);
 //BoardChecker.CompareSolverTimes<SmarterPermutationBuilderBoardSolver, CountedSPermutationBuilderBoardSolver>(BoardType.Beginner,1000);

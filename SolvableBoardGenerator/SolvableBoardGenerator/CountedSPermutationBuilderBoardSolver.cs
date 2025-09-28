@@ -275,10 +275,6 @@ namespace Minesweeper
                 trivialEdgeMinCount += tbounds.trivialMinMineCount;
                 trivialEdgeMaxCount += tbounds.trivialMaxMineCount;
             }
-            if (MineCount > trivialEdgeMaxCount)
-            {
-                return false; //trivial Max is an upper bound of edge mines
-            }
             if (MineCount < trivialEdgeMinCount)
             {
                 throw new Exception($"{nameof(MineCountTester)} counted a lower bound for edge mines that is higher than the current mine count. Something must truly be off.");
@@ -302,10 +298,6 @@ namespace Minesweeper
                 minEdgeCount += group.minMineCount;
                 maxEdgeCount += group.maxMineCount;
             }
-            /*if (MineCount > maxEdgeCount)
-            {
-                return false;
-            }*/
             if (MineCount < minEdgeCount)
             {
                 throw new Exception($"{nameof(MineCountTester)} counted a lower bound for edge mines that is higher than the current mine count. Something must truly be off.");
@@ -413,7 +405,7 @@ namespace Minesweeper
                 }
                 int sharedSquares = alreadyProcessedSquares.Count;
                 trivialMinMineCount += (uint)Math.Max(0, node.MineRegionPermutation.MinMineCount - sharedSquares);
-                trivialMaxMineCount += (node.MineRegionPermutation.MaxMineCount + (uint)sharedSquares);
+                trivialMaxMineCount += node.MineRegionPermutation.MaxMineCount;
             }
             return (trivialMinMineCount, trivialMaxMineCount);
         }
