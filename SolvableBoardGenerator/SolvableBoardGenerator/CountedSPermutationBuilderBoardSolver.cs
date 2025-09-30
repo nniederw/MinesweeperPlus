@@ -1,21 +1,36 @@
 ﻿using System.Collections;
-
 namespace Minesweeper
 {
-    public class CountedSPermutationBuilderBoardSolver : BaseBoardSolver
+    public class CountedSPermutationBuilderBoardSolver : BaseBoardSolver, IConfigurableBoardSolver
     {
+        private bool UseMineCounting = true;
+        private bool UseNon1SizedPattern = true;
         private Dictionary<(int x, int y), MineRegionPermutationNode> RegionsDictionary = new Dictionary<(int x, int y), MineRegionPermutationNode>();
         private HashSet<MineRegionPermutationNode> LastActivePermutationNodes = new HashSet<MineRegionPermutationNode>();
         private List<List<MineRegionPermutationNode>> LastActiveNodesGroups = new List<List<MineRegionPermutationNode>>();
         public CountedSPermutationBuilderBoardSolver() : base() { }
         public CountedSPermutationBuilderBoardSolver(IBoard board, bool verboseLogging = false) : base(board, verboseLogging) { }
+        public void DoMineCount(bool doit)
+        {
+            UseMineCounting = doit;
+        }
+        public void DoNon1SizedPatterns(bool doit)
+        {
+            UseNon1SizedPattern = doit;
+        }
         protected override IEnumerable<Func<bool>> PhaseSequence()
         {
             yield return TestPS1;
             LastActiveNodesGroups.Clear();
             LastActivePermutationNodes.Clear();
-            yield return PermutationBuildingAlgorithm;
-            yield return MineCountTester;
+            if (UseNon1SizedPattern)
+            {
+                yield return PermutationBuildingAlgorithm;
+                if (UseMineCounting)
+                {
+                    yield return MineCountTester;
+                }
+            }
         }
         private IEnumerable<MineRegionPermutationNode> GetRegionsFromActiveNumbers()
             => ActiveNumbers.Select(i => MineRegionPNodeFromNumber(i));

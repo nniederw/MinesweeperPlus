@@ -160,27 +160,28 @@ for (int i = 0; i < 0; i++)
         Console.WriteLine($"Current time saving of BitArrayBoard: {timeDifference.TotalMilliseconds}ms (positive = BitArrayBoard is faster)");
     }
 }
+//BoardChecker.CompareSolverTimes<CountedSPermutationBuilderBoardSolver, SmarterPermutationBuilderBoardSolver>(new BoardType(100, 100, 2100), 1);
 //IBoard bb = BoardGenerator.GetRandomSeededBoard(BoardType.Beginner, 1564106);
 //BoardChecker.SolverComparer<EdgeBruteForceBoardSolver, CountedSPermutationBuilderBoardSolver>(bb, BoardChecker.FindFirstZero(bb), true, true);
-BoardChecker.CompareSolverTimes<EdgeBruteForceBoardSolver, CountedSPermutationBuilderBoardSolver>(BoardType.SmallHighDensityTestBoard, 50000);
+//BoardChecker.CompareSolverTimes<EdgeBruteForceBoardSolver, CountedSPermutationBuilderBoardSolver>(BoardType.SmallHighDensityTestBoard, 50000);
 //BoardChecker.CompareSolverTimes<SmarterPermutationBuilderBoardSolver, EfficientSmartPermutationBuilderBoardSolver>(BoardType.Expert, 100);
 //BoardChecker.CompareSolverTimes<SmarterPermutationBuilderBoardSolver, CountedSPermutationBuilderBoardSolver>(BoardType.Expert, 100, false);
 //BoardChecker.CompareSolverTimes<SmarterPermutationBuilderBoardSolver, CountedSPermutationBuilderBoardSolver>(BoardType.Beginner,1000);
 timeDifference = TimeSpan.Zero;
 firstTime = true;
 bool switchEvenOdd = false;
-for (int i = 0; i < 0; i++) //cases where CountedSPermutationBuilderBoardSolver is incomplete: 5983, 6459, 8311, 11118
+for (int i = 0; i < 100; i++) //cases where CountedSPermutationBuilderBoardSolver is incomplete: 5983, 6459, 8311, 11118
 {
-    Board b = BoardGenerator.GetRandomSeededBoard(BoardType.Beginner, i);
+    //Board b = BoardGenerator.GetRandomSeededBoard(BoardType.Beginner, i);
     //Board b = BoardGenerator.GetRandomSeededBoard(BoardType.Expert, i);
     Console.Write($"[{i}]");
-    //Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(100, 100, 2100), i);
+    Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(100, 100, 2100), i);
     //Board b = BoardGenerator.GetRandomSeededBoard(new BoardType(200, 200, 5000), i);
     var startPos = BoardChecker.FindFirstZero(b);
     TimeSpan t;
     if (!switchEvenOdd || i % 2 == 0)
     {
-        t = BoardChecker.SolverComparer<CountedSPermutationBuilderBoardSolver, EdgeBruteForceBoardSolver>(b, startPos, true, false);
+        t = BoardChecker.SolverComparer<CountedSPermutationBuilderBoardSolver, SmarterPermutationBuilderBoardSolver>(b, startPos, false, false);
     }
     else
     {
